@@ -40,18 +40,30 @@
             <el-checkbox class="autoLogin-radio" v-model="loginForm.autoLogin">自动登录</el-checkbox >
           </el-form-item>
           <el-form-item>
-            <el-button style="width: 100%" type="primary" @click="login">登录</el-button>
+            <el-button style="width: 100%"
+                       type="primary"
+                       @click="login"
+
+            >
+              登录
+            </el-button>
           </el-form-item>
         </el-form>
       </section>
-  </div>
+    </div>
 </template>
 
 <script>
 
+import Particles from '@/components/particles/Particles'
+import Vue from "vue";
+
 
 export default {
   name: "LoginView",
+  components:{
+    "Particles" : Particles
+  },
 
   data() {
     return {
@@ -70,6 +82,8 @@ export default {
         msg: "账号或密码错误",
         msgFlag: false,
       },
+
+      fullscreenLoading : false,
 
 
 
@@ -110,8 +124,7 @@ export default {
             autoLogin: this.autoLogin
           }
         }).then(res => {
-          console.log(res.data.errmsg)
-          console.log(res.data.errno)
+          console.log(res.data)
 
           if (res.data.errno != 408) {
             if (res.data.errno == 103) {
@@ -119,11 +132,29 @@ export default {
             } else {
               this.setMsgBox(true, res.data.errmsg)
             }
+          } else {//登录成功
+            //将token存入store
+            this.$store.commit("setToken",res.data.token)
+            //将userInfo存入store
+            this.$store.commit("setUserInfo",res.data.userInfo)
+            //登录加载
+            const loading = this.$loading({
+              lock: true,
+              text: '登录中...',
+              background: 'rgba(225, 225, 225, 0.7)'
+            });
+            setTimeout(() => {
+              loading.close()
+              console.log("进入主页")
+              this.$router.replace({
+                name: "home"
+              })
+            },1000)
           }
 
-        })
+          this.changeCode()
 
-        this.changeCode()
+        })
       }
     },
 
@@ -182,5 +213,4 @@ export default {
     #info{
       height: 28px;
     }
-
 </style>
