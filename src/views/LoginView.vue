@@ -33,7 +33,7 @@
                 prefix-icon="el-icon-key"
             ></el-input>
             <div class="login-code" >
-              <img :src="codeURL" @click="changeCode" id="verifyCode" />
+              <img :src="codeURL" @click="changeCode" />
             </div>
           </el-form-item>
           <el-form-item prop="autoLogin" class="autoLogin-radio-box">
@@ -56,7 +56,6 @@
 <script>
 
 import Particles from '@/components/particles/Particles'
-import Vue from "vue";
 
 
 export default {
@@ -68,13 +67,13 @@ export default {
   data() {
     return {
       loginForm: {
-        username: '',
-        password: '',
+        username: 'admin',
+        password: 'admin123',
         autoLogin: false,
         code: ""
       },
 
-      codeURL: "http://localhost:8090/admin/auth/verifyCode",
+      codeURL:this.$store.getters["loginUser/getCode"],
       index: 1,
 
 
@@ -105,57 +104,53 @@ export default {
     }
   },
 
+
   methods:{
+
+
+    /**
+     * 更改验证码
+     */
     changeCode(){
-      this.codeURL = "http://localhost:8090/admin/auth/verifyCode?" + this.index++;
+      this.$store.dispatch("loginUser/changeCode",this.index++);
+      this.codeURL = this.$store.getters["loginUser/getCode"];
+      console.log(this.codeURL);
     },
 
+
     login() {
-
-      console.log(this.loginForm.code)
-      if (this.loginForm.username != "" && this.loginForm.password != "" && this.loginForm.code != "") {
-        axios({
-          method: "POST",
-          url: "http://localhost:8090/admin/auth/login",
-          data: {
-            username: this.loginForm.username,
-            password: this.loginForm.password,
-            code: this.loginForm.code,
-            autoLogin: this.autoLogin
-          }
-        }).then(res => {
-          console.log(res.data)
-
-          if (res.data.errno != 408) {
-            if (res.data.errno == 103) {
-              this.setMsgBox(false, res.data.errmsg)
-            } else {
-              this.setMsgBox(true, res.data.errmsg)
-            }
-          } else {//登录成功
-            //将token存入store
-            this.$store.commit("setToken",res.data.token)
-            //将userInfo存入store
-            this.$store.commit("setUserInfo",res.data.userInfo)
-            //登录加载
-            const loading = this.$loading({
-              lock: true,
-              text: '登录中...',
-              background: 'rgba(225, 225, 225, 0.7)'
-            });
-            setTimeout(() => {
-              loading.close()
-              console.log("进入主页")
-              this.$router.replace({
-                name: "home"
-              })
-            },1000)
-          }
-
-          this.changeCode()
-
-        })
+      //发送请求
+      this.$store.dispatch('loginUser/login',this.loginForm).then(res => {
+        //判断结果
+      if (res.data.errno != 408){
+        if (res.data.errno == 103) {
+          this.setMsgBox(false, res.data.errmsg)
+        } else {
+          this.setMsgBox(true, tres.data.errmsg)
+        }
+      } else {//登录成功
+        //将token存入store
+        this.$store.commit("setToken",res.data.data.token);
+        //将userInfo存入store
+        this.$store.commit("setUserInfo",res.data.data.userInfo)
+        //登录加载
+        const loading = this.$loading({
+          lock: true,
+          text: '登录中...',
+          background: 'rgba(225, 225, 225, 0.7)'
+        });
+        setTimeout(() => {
+          loading.close()
+          console.log("进入主页")
+          this.$router.replace({
+            name: "home"
+          })
+        },1000)
       }
+
+      this.changeCode()
+
+    })
     },
 
     //设置信息提示框并清空错误项

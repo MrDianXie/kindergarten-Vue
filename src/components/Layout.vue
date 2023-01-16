@@ -7,7 +7,7 @@
       </span>
 
       <span>
-        <img src="http://localhost:8090/avatar" width="50" alt="">
+        <img :src="avatarUrl" width="50" alt="">
         <i></i>
       </span>
     </el-header>
@@ -93,8 +93,12 @@ export default {
 
   data(){
     return {
-      isCollapse: false
+      isCollapse: false,
+      username : "admin",
+      avatarUrl: "http://localhost:8090/admin/home/getAvatar?username=admin",
     }
+
+
   },
 
   methods: {
