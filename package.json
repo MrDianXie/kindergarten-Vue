@@ -8,9 +8,11 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "echarts": "^5.1.2",
     "element-ui": "^2.4.5",
     "particles.js": "^2.0.0",
     "vue": "^2.6.14",
+    "vue-particles": "^1.0.9",
     "vue-router": "^3.5.1",
     "vuex": "^3.6.2"
   },
@@ -23,6 +25,7 @@
     "less": "^4.0.0",
     "less-loader": "^8.0.0",
     "vue-cli-plugin-axios": "^0.0.4",
+    "vue-cli-plugin-charts": "^1.0.4",
     "vue-cli-plugin-element": "^1.0.1",
     "vue-template-compiler": "^2.6.14"
   },

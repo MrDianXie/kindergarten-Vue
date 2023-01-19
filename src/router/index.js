@@ -10,15 +10,20 @@ const routes = [
     component: () => import("@/views/LoginView")
   },
   {
-    path: "/home",
+    path: "/admin/home",
     name: 'home',
     component: () => import("@/views/HomeView")
   },
   {
-    path: "/afficheList",
+    path: "/admin/afficheList",
     name: 'afficheList',
     component: () => import("@/views/AfficheListView")
   },
+  {
+    path: '/admin/teacherList',
+    name: 'teacherList',
+    component: () => import("@/views/TeacherList")
+  }
 ]
 
 const router = new VueRouter({

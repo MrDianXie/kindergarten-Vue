@@ -12,7 +12,10 @@ export default {
     state: {
         // 存储token
         token:"",
-        userInfo: null,
+        userInfo: {
+            username: "",
+            avatar: ""
+        },
         codeUrl: "http://localhost:8090/admin/auth/verifyCode",
 
         loginView: {
@@ -65,7 +68,7 @@ export default {
 
         setLoginView(state,loginView){
             state.loginView = loginView;
-        }
+        },
     },
 
     actions:{
@@ -93,14 +96,7 @@ export default {
          * @param loginInfo
          */
         login(ctx,loginInfo) {
-            return userAPI.login(loginInfo)
-            //     .then(res =>{
-            //     // console.log(res.data)
-            //     // ctx.commit("setLoginView",{
-            //     //     errmsg: res.data.errmsg,
-            //     //     errno: res.data.errno
-            //     // })
-            // });
+            return userAPI.login(loginInfo);
         }
     }
 

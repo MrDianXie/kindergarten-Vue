@@ -3,12 +3,13 @@
     <el-header>
       <span>
         <img src="../assets/logo.png" width="50" alt="">
-        <b>后端管理系统</b>
+        <b>翻斗花园后端管理系统</b>
       </span>
 
       <span>
-        <img :src="avatarUrl" width="50" alt="">
-        <i></i>
+
+        <el-avatar :size="40" :src="avatarUrl"></el-avatar>
+        <i>{{ this.$store.getters['loginUser/getUserInfo'].username }}</i>
       </span>
     </el-header>
     <el-container class="container">
@@ -22,14 +23,21 @@
               :collapse="isCollapse"
               :router="true"
           >
+
+            <el-menu-item index="/admin/home">
+              <i class="el-icon-menu"></i>
+              <span slot="title" class="home-menu">首页</span>
+            </el-menu-item>
+
             <el-submenu index="1">
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>公告管理</span>
               </template>
+
               <el-menu-item-group>
                 <el-menu-item>公告列表</el-menu-item>
-                <el-menu-item index="/afficheList">新增公告</el-menu-item>
+                <el-menu-item index="/admin/afficheList">新增公告</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
 
@@ -39,7 +47,7 @@
                 <span>教师管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item index="1">选项1</el-menu-item>
+                <el-menu-item index="/admin/teacherList">教师列表</el-menu-item>
                 <el-menu-item index="2">选项2</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
@@ -112,6 +120,10 @@ export default {
 </script>
 
 <style scoped lang="less">
+
+.home-menu{
+  text-align: center;
+}
 
 #van{
   margin-top: 30px;

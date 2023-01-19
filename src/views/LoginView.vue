@@ -1,67 +1,94 @@
 <template>
-  <div class="login-box">
-      <section>
-        <h2>翻斗幼儿园后台管理系统</h2>
-        <el-alert id="info" v-if="this.resultInfo.msgFlag"
-                  :title="this.resultInfo.msg"
-                  type="error"
-                  :closable=false
-                  center
-                  show-icon>
-        </el-alert>
-        <el-form
-            :model="loginForm"
-            status-icon
-            :rules="rules"
-            ref="loginForm"
-        >
-          <el-form-item prop="username">
+  <div>
+    <lantern text="新" :left="10"/>
+    <lantern text="春" :left="30"/>
+    <lantern text="快" :left="60"/>
+    <lantern text="乐" :left="80"/>
 
-            <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="用户名"></el-input>
-          </el-form-item>
+    <div class="login-box">
+      <vue-particles
+          class="bg-par"
+          color="#dedede"
+          :particleOpacity="0.7"
+          :particlesNumber="80"
+          shapeType="star"
+          :particleSize="4"
+          linesColor="#dedede"
+          :linesWidth="1"
+          :lineLinked="true"
+          :lineOpacity="0.4"
+          :linesDistance="150"
+          :moveSpeed="3"
+          :hoverEffect="true"
+          hoverMode="grab"
+          :clickEffect="true"
+          clickMode="repulse"
+      />
+        <section>
+          <h2>翻斗幼儿园后台管理系统</h2>
+          <el-alert id="info" v-if="this.resultInfo.msgFlag"
+                    :title="this.resultInfo.msg"
+                    type="error"
+                    :closable=false
+                    center
+                    show-icon>
+          </el-alert>
+          <el-form
+              :model="loginForm"
+              status-icon
+              :rules="rules"
+              ref="loginForm"
+          >
+            <el-form-item prop="username">
 
-          <el-form-item prop="password">
-            <el-input type="password" v-model="loginForm.password" prefix-icon="el-icon-lock" placeholder="密码"></el-input>
-          </el-form-item>
-          <el-form-item prop="code">
-            <el-input class="code"
-                v-model="loginForm.code"
-                auto-complete="off"
-                placeholder="验证码"
-                style="width: 63%"
-                @keyup.enter.native="true"
-                prefix-icon="el-icon-key"
-            ></el-input>
-            <div class="login-code" >
-              <img :src="codeURL" @click="changeCode" />
-            </div>
-          </el-form-item>
-          <el-form-item prop="autoLogin" class="autoLogin-radio-box">
-            <el-checkbox class="autoLogin-radio" v-model="loginForm.autoLogin">自动登录</el-checkbox >
-          </el-form-item>
-          <el-form-item>
-            <el-button style="width: 100%"
-                       type="primary"
-                       @click="login"
+              <el-input v-model="loginForm.username" prefix-icon="el-icon-user" placeholder="用户名"></el-input>
+            </el-form-item>
 
-            >
-              登录
-            </el-button>
-          </el-form-item>
-        </el-form>
-      </section>
+            <el-form-item prop="password">
+              <el-input type="password" v-model="loginForm.password" prefix-icon="el-icon-lock" placeholder="密码"></el-input>
+            </el-form-item>
+            <el-form-item prop="code">
+              <el-input class="code"
+                        v-model="loginForm.code"
+                        auto-complete="off"
+                        placeholder="验证码"
+                        style="width: 63%"
+                        @keyup.enter.native="true"
+                        prefix-icon="el-icon-key"
+              ></el-input>
+              <div class="login-code" >
+                <img :src="codeURL" @click="changeCode" />
+              </div>
+            </el-form-item>
+            <el-form-item prop="autoLogin" class="autoLogin-radio-box">
+              <el-checkbox class="autoLogin-radio" v-model="loginForm.autoLogin">自动登录</el-checkbox >
+            </el-form-item>
+            <el-form-item>
+              <el-button style="width: 100%"
+                         type="primary"
+                         @click="login"
+
+              >
+                登录
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </section>
     </div>
+
+  </div>
+
 </template>
 
 <script>
 
-import Particles from '@/components/particles/Particles'
+import lantern from '@/components/Lantern'
 
 
 export default {
   name: "LoginView",
   components:{
-    "Particles" : Particles
+    "lantern" : lantern,
   },
 
   data() {
@@ -126,13 +153,15 @@ export default {
         if (res.data.errno == 103) {
           this.setMsgBox(false, res.data.errmsg)
         } else {
-          this.setMsgBox(true, tres.data.errmsg)
+          this.setMsgBox(true, res.data.errmsg)
         }
       } else {//登录成功
         //将token存入store
-        this.$store.commit("setToken",res.data.data.token);
+        console.log(res.data)
+
+        this.$store.commit("loginUser/setToken",res.data.data.token);
         //将userInfo存入store
-        this.$store.commit("setUserInfo",res.data.data.userInfo)
+        this.$store.commit("loginUser/setUserInfo",res.data.data.userInfo)
         //登录加载
         const loading = this.$loading({
           lock: true,
@@ -171,13 +200,14 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+
     .login-box{
       display: flex;
       align-items: center;
       justify-content: center;
-      background: url("../assets/bg2.jpg") no-repeat center / cover;
       height: 100vh;
+      background: url('../assets/bg2.jpg') no-repeat center / cover;
     }
 
     .login-box h2{
@@ -185,7 +215,15 @@ export default {
       color: #707070;
     }
 
+    .bg-par{
+      width: 100%;
+      height: 100%;
+      position: fixed;
+
+    }
+
     .login-box section {
+      position: fixed;
       border-radius: 6px;
       background: #fff;
       width: 400px;
