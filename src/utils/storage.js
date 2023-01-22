@@ -1,14 +1,15 @@
 
-// 封装操作localstorage本地存储的方法  模块化
+// 封装操作sessionStorage本地存储的方法  模块化
 var storage = {
     set(key, value) {
-        localStorage.setItem(key, JSON.stringify(value));
+        sessionStorage.setItem(key, JSON.stringify(value))
+        // localStorage.setItem();
     },
     get(key) {
-        return JSON.parse(localStorage.getItem(key));
+        return JSON.parse(sessionStorage.getItem(key));
     },
     getForIndex(index) {
-        return localStorage.key(index);
+        return sessionStorage.key(index);
     },
     getKeys(){
         let items = this.getAll();
@@ -19,25 +20,25 @@ var storage = {
         return keys;
     },
     getLength() {
-        return localStorage.length;
+        return sessionStorage.length;
     },
     getSupport() {
         return (typeof (Storage) !== "undefined") ? true : false;
     },
     remove(key) {
-        localStorage.removeItem(key);
+        sessionStorage.removeItem(key);
     },
     removeAll() {
-        localStorage.clear();
+        sessionStorage.clear();
     },
     getAll() {
-        let len = localStorage.length;  // 获取长度
+        let len = sessionStorage.length;  // 获取长度
         let arr = new Array(); // 定义数据集
         for (var i = 0; i < len; i++) {
             // 获取key 索引从0开始
-            var getKey = localStorage.key(i);
+            var getKey = sessionStorage.key(i);
             // 获取key对应的值
-            var getVal = localStorage.getItem(getKey);
+            var getVal = sessionStorage.getItem(getKey);
             // 放进数组
             arr[i] = {
                 'key': getKey,

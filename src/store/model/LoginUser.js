@@ -1,5 +1,6 @@
-import storage from "@/model/storage";
+import storage from "@/utils/storage";
 import * as userAPI from '@/api/User'
+import store from "@/store";
 
 /**
  * 用户登录模块
@@ -13,15 +14,11 @@ export default {
         // 存储token
         token:"",
         userInfo: {
+            online : false,
             username: "",
             avatar: ""
         },
         codeUrl: "http://localhost:8090/admin/auth/verifyCode",
-
-        loginView: {
-            errmsg: "",
-            errno: ""
-        },
 
     },
 
@@ -39,9 +36,10 @@ export default {
             return state.codeUrl
         },
 
-        getLoginView(state){
-            return state.loginView
-        },
+        getOnline(state){
+            return state.userInfo.online
+        }
+
 
     },
 
@@ -51,7 +49,7 @@ export default {
         setToken(state,token) {
             state.token = token;
             storage.set('token', token);
-            console.log('store、localstorage保存token成功！');
+            console.log('store、sessionStorage保存token成功！');
         },
         delToken(state) {
             state.token = "";
@@ -66,9 +64,10 @@ export default {
             state.codeUrl = codeUrl;
         },
 
-        setLoginView(state,loginView){
-            state.loginView = loginView;
-        },
+        setOnline(state,payload){
+            state.userInfo.online = payload
+        }
+
     },
 
     actions:{
@@ -85,8 +84,6 @@ export default {
                 //设置返回的url
                 ctx.commit("setCode",res.codeUrl)
             })
-
-
         },
 
 
@@ -97,6 +94,15 @@ export default {
          */
         login(ctx,loginInfo) {
             return userAPI.login(loginInfo);
+        },
+
+        async whoAmI(ctx,token){
+             await userAPI.whoAmI(token).then(res => {
+                 if (res.data.errno === 408){
+                     ctx.commit('setUserInfo',res.data.data)
+                     ctx.commit('setOnline',true)
+                 }
+            })
         }
     }
 

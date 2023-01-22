@@ -10,7 +10,6 @@ export default {
 
     mutations: {
 
-
     },
 
     getters: {

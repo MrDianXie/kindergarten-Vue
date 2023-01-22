@@ -17,8 +17,6 @@ Vue.component("Layout",Layout)
 Vue.use(router)
 
 
-Vue.prototype.$api=Api;
-Vue.prototype.$http = axios
 Vue.config.productionTip = false
 
 new Vue({

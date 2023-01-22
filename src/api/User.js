@@ -23,14 +23,19 @@ export async function login(loginInfo){
  * @author XIE
  */
 export async function getVerCode(index){
-
-
-
-
     return {
         index: index,
         codeUrl : "http://localhost:8090/admin/auth/verifyCode?" + index,
     };
+}
 
 
+export async function whoAmI(token){
+    return axios({
+        method: 'POST',
+        headers:{
+            'X-Admin-Token': token
+        },
+        url: 'http://localhost:8090/admin/home/whoAmI'
+    })
 }

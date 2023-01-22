@@ -84,12 +84,12 @@
 
 import lantern from '@/components/Lantern'
 
-
 export default {
   name: "LoginView",
   components:{
     "lantern" : lantern,
   },
+
 
   data() {
     return {
@@ -103,17 +103,12 @@ export default {
       codeURL:this.$store.getters["loginUser/getCode"],
       index: 1,
 
-
       resultInfo: {
         msg: "账号或密码错误",
         msgFlag: false,
       },
 
       fullscreenLoading : false,
-
-
-
-
 
       rules: {
         username: [
@@ -143,43 +138,37 @@ export default {
       this.codeURL = this.$store.getters["loginUser/getCode"];
       console.log(this.codeURL);
     },
-
-
     login() {
       //发送请求
       this.$store.dispatch('loginUser/login',this.loginForm).then(res => {
         //判断结果
-      if (res.data.errno != 408){
-        if (res.data.errno == 103) {
-          this.setMsgBox(false, res.data.errmsg)
-        } else {
-          this.setMsgBox(true, res.data.errmsg)
+        if (res.data.errno !== 408) {
+          if (res.data.errno === 103) {
+            this.setMsgBox(false, res.data.errmsg)
+          } else {
+            this.setMsgBox(true, res.data.errmsg)
+          }
+        } else {//登录成功
+
+          this.$store.commit('loginUser/setToken',res.data.data.token)
+          this.$store.commit('loginUser/setUserInfo',res.data.data.userInfo)
+          this.$store.commit('loginUser/setOnline',true)
+          //登录加载
+          const loading = this.$loading({
+            lock: true,
+            text: '登录中...',
+            background: 'rgba(225, 225, 225, 0.7)'
+          });
+          setTimeout(() => {
+            loading.close()
+            console.log("进入主页")
+            this.$router.replace({
+              name: "home"
+            })
+          }, 1000)
         }
-      } else {//登录成功
-        //将token存入store
-        console.log(res.data)
-
-        this.$store.commit("loginUser/setToken",res.data.data.token);
-        //将userInfo存入store
-        this.$store.commit("loginUser/setUserInfo",res.data.data.userInfo)
-        //登录加载
-        const loading = this.$loading({
-          lock: true,
-          text: '登录中...',
-          background: 'rgba(225, 225, 225, 0.7)'
-        });
-        setTimeout(() => {
-          loading.close()
-          console.log("进入主页")
-          this.$router.replace({
-            name: "home"
-          })
-        },1000)
-      }
-
-      this.changeCode()
-
-    })
+        this.changeCode()
+      })
     },
 
     //设置信息提示框并清空错误项
@@ -193,9 +182,21 @@ export default {
       } else {
         this.loginForm.code = ''
       }
-
       this.changeCode()
     },
+
+  },
+
+  created() {
+    if (this.$route.query.result === 'unlogin'){
+
+      const h = this.$createElement;
+
+      this.$notify.error({
+        title: '非法操作',
+        message: h('i', { style: 'color: red'}, '用户未登录，请先登录！')
+      });
+    }
   }
 }
 </script>
