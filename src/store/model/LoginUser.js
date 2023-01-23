@@ -13,11 +13,7 @@ export default {
     state: {
         // 存储token
         token:"",
-        userInfo: {
-            online : false,
-            username: "",
-            avatar: ""
-        },
+        userInfo: null,
         codeUrl: "http://localhost:8090/admin/auth/verifyCode",
 
     },
@@ -35,12 +31,6 @@ export default {
         getCode(state){
             return state.codeUrl
         },
-
-        getOnline(state){
-            return state.userInfo.online
-        }
-
-
     },
 
     mutations:{
@@ -63,11 +53,6 @@ export default {
         setCode(state,codeUrl){
             state.codeUrl = codeUrl;
         },
-
-        setOnline(state,payload){
-            state.userInfo.online = payload
-        }
-
     },
 
     actions:{
@@ -96,11 +81,14 @@ export default {
             return userAPI.login(loginInfo);
         },
 
+
         async whoAmI(ctx,token){
              await userAPI.whoAmI(token).then(res => {
                  if (res.data.errno === 408){
                      ctx.commit('setUserInfo',res.data.data)
-                     ctx.commit('setOnline',true)
+                 } else if (res.data.data === 208){
+                     console.log(res.data.data)
+                     ctx.commit('loginUser/setUserInfo',null)
                  }
             })
         }

@@ -55,7 +55,8 @@ router.beforeEach((to, from, next) => {
     if (token != null){//token存在
       //验证token的有效性
       store.dispatch('loginUser/whoAmI',token)
-      if (store.getters['loginUser/getOnline']){
+      const userInfo = store.getters['loginUser/getUserInfo']
+      if (userInfo !== null){
         next()
       } else {
         next("/?result=unlogin")

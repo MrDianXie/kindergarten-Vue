@@ -21,8 +21,8 @@ export default {
             return teacherAPI.getTeacherList();
         },
 
-        async selectTeacher(ctx,teacherInfo){
-           return teacherAPI.selectTeacher(teacherInfo);
+        async selectTeacher(ctx,selectKey){
+           return teacherAPI.selectTeacher(selectKey);
         }
     },
 

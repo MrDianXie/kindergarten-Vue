@@ -2,6 +2,8 @@
  * 获取教师列表API
  * @returns {Promise<void>}
  */
+import qs from 'qs';
+
 export async function getTeacherList(){
     return axios({
         method: 'GET',
@@ -14,13 +16,11 @@ export async function getTeacherList(){
  * @param teacherInfo
  * @returns {Promise<*>}
  */
-export async function selectTeacher(teacherInfo){
+export async function selectTeacher(selectKey){
     return axios({
         method : 'POST',
-        url: 'http://localhost:8090/admin/teacher/selectByName',
-        data : {
-            selectKey : teacherInfo.selectKey,
-            uid: teacherInfo.uid,
-        }
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        url: 'http://localhost:8090/admin/teacher/selectTeacher',
+        data : qs.stringify({selectKey : selectKey}),
     })
 }
