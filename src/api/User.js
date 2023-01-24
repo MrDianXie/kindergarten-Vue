@@ -6,7 +6,7 @@
  * @param loginInfo
  */
 export async function login(loginInfo){
-    return axios({
+    return await axios({
         method: "POST",
         url: "http://localhost:8090/admin/auth/login",
         data: {
@@ -30,11 +30,11 @@ export async function getVerCode(index){
 }
 
 
-export async function whoAmI(token){
-    return axios({
+export async function whoAmI(){
+    return await axios({
         method: 'POST',
         headers:{
-            'X-Admin-Token': token
+            'X-Admin-Token': store.getters['loginUser/getToken']
         },
         url: 'http://localhost:8090/admin/home/whoAmI'
     })

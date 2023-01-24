@@ -53,7 +53,7 @@
                         auto-complete="off"
                         placeholder="验证码"
                         style="width: 63%"
-                        @keyup.enter.native="true"
+                        @keyup.enter.native="login"
                         prefix-icon="el-icon-key"
               ></el-input>
               <div class="login-code" >
@@ -137,40 +137,40 @@ export default {
       this.codeURL = this.$store.getters["loginUser/getCode"];
       console.log(this.codeURL);
     },
-    login() {
+    async login() {
       //发送请求
-      this.$store.dispatch('loginUser/login',this.loginForm).then(res => {
-        //判断结果
-        if (res.data.errno !== 408) {
-          if (res.data.errno === 103) {
-            this.setMsgBox(false, res.data.errmsg)
-          } else {
-            this.setMsgBox(true, res.data.errmsg)
-          }
-        } else {//登录成功
+      await this.$store.dispatch('loginUser/login',this.loginForm)
+      //获取响应结果
+      console.log('登录响应码',this.$store.getters['loginUser/getLoginResult'])
+      const result = this.$store.getters['loginUser/getLoginResult']
 
-          this.$store.commit('loginUser/setToken',res.data.data.token)
-          this.$store.commit('loginUser/setUserInfo',res.data.data.userInfo)
-          this.$store.commit('loginUser/setOnline',true)
-          //登录加载
-          const loading = this.$loading({
-            lock: true,
-            text: '登录中...',
-            background: 'rgba(225, 225, 225, 0.7)'
-          });
-          setTimeout(() => {
-            loading.close()
-            console.log("进入主页")
-            this.$router.replace({
-              name: "home"
-            })
-          }, 1000)
-        }
+      if (result === '登录成功'){
+        const loading = this.$loading({
+          lock: true,
+          text: '登录中...',
+          background: 'rgba(225, 225, 225, 0.7)'
+        });
+        setTimeout(() => {
+          loading.close()
+          console.log("进入主页")
+          this.$router.replace({
+            name: "home"
+          })
+        }, 1000)
+
         this.changeCode()
-      })
+      } else if (result === '账号或密码错误'){
+        this.setMsgBox(true,'账号或密码错误')
+      } else if (result === '验证码错误'){
+        this.setMsgBox(false,'验证码错误')
+      }
     },
 
-    //设置信息提示框并清空错误项
+    /**
+     *
+     * @param flag 决定清空的输入框
+     * @param msg  错误展示信息
+     */
     setMsgBox(flag,msg) {
       this.resultInfo.msg = msg;
       this.resultInfo.msgFlag = true

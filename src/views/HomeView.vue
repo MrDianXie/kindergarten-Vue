@@ -81,6 +81,9 @@ export default {
   },
   mounted () {
     this.initEcharts();
+  },
+
+  created() {
   }
 }
 </script>

@@ -9,7 +9,7 @@
       <span>
 
         <el-avatar :size="40" :src="avatarUrl"></el-avatar>
-        <i>{{ this.$store.getters['loginUser/getUserInfo'].username }}</i>
+        <i>{{ 'admin' }}</i>
       </span>
     </el-header>
     <el-container class="container">
@@ -113,7 +113,6 @@ export default {
     toggleCollapse () {
       this.isCollapse = !this.isCollapse
     },
-
   }
 
 }

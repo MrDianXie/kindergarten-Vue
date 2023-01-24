@@ -1,6 +1,5 @@
 import storage from "@/utils/storage";
 import * as userAPI from '@/api/User'
-import store from "@/store";
 
 /**
  * 用户登录模块
@@ -13,24 +12,56 @@ export default {
     state: {
         // 存储token
         token:"",
-        userInfo: null,
-        codeUrl: "http://localhost:8090/admin/auth/verifyCode",
+        loading: false, //是否正在登录中
+        user: null, //登录用户
+        codeUrl: "http://localhost:8090/admin/auth/verifyCode", //验证码
+
+        errno: null,
+        errmsg: null,
 
     },
 
     getters:{
+
+        //获取token
         getToken(state){
             return state.token || storage.get("token");
         },
 
-        getUserInfo(state){
-            return state.userInfo;
+        //获取用户
+        getUser(state){
+            return state.user
+        },
+
+        //获取登录响应信息
+        getLoginResult(state){
+            switch (state.errno){
+                case 408:
+                    return '登录成功'
+                case 101:
+                case 102:
+                    return '账号或密码错误'
+                case 103:
+                    return '验证码错误'
+            }
         },
 
         //获取验证码
         getCode(state){
             return state.codeUrl
         },
+
+        //获取用户状态
+        getStatus(state){
+            if (state.loading){
+                return 'loading'
+            } else if(state.user){
+                return 'login'
+            } else {
+                return 'unlogin'
+            }
+
+        }
     },
 
     mutations:{
@@ -45,13 +76,29 @@ export default {
             state.token = "";
             storage.remove("token");
         },
-        // 可选
-        setUserInfo(state, userInfo) {
-            state.userInfo = userInfo;
+
+
+        setLoading(state,payload){
+            state.loading = payload;
+
+        },
+
+        setUser(state,payload){
+            state.user = payload
         },
 
         setCode(state,codeUrl){
             state.codeUrl = codeUrl;
+        },
+
+        //设置返回状态码
+        setErrno(state,errno){
+            state.errno = errno;
+        },
+
+        //设置返回信息
+        setErrMsg(state,msg){
+            state.errmsg = msg;
         },
     },
 
@@ -73,24 +120,50 @@ export default {
 
 
         /**
-         * 登录
+         *
          * @param ctx
          * @param loginInfo
+         * @returns {Promise<void>}
          */
-        login(ctx,loginInfo) {
-            return userAPI.login(loginInfo);
+        async login(ctx,loginInfo) {
+            const resp = await userAPI.login(loginInfo);
+            console.log('登录操作',resp);
+            ctx.commit('setLoading',true);
+            if (resp.data.errno === 408){
+                //提交token
+                ctx.commit('setToken',resp.data.data.token)
+                //提交用户信息
+                ctx.commit('setUser',resp.data.data.userInfo)
+
+                ctx.commit('setErrno',resp.data.errno)
+                ctx.commit('setErrMsg',resp.data.errmsg)
+
+            } else {
+                console.log("登录失败")
+                ctx.commit('setErrno',resp.data.errno)
+                ctx.commit('setErrMsg',resp.data.errmsg)
+            }
+            ctx.commit('setLoading',false)
         },
 
+        /**
+         * @param ctx
+         * @returns {Promise<void>}
+         */
+        async whoAmI(ctx){
 
-        async whoAmI(ctx,token){
-             await userAPI.whoAmI(token).then(res => {
-                 if (res.data.errno === 408){
-                     ctx.commit('setUserInfo',res.data.data)
-                 } else if (res.data.data === 208){
-                     console.log(res.data.data)
-                     ctx.commit('loginUser/setUserInfo',null)
-                 }
-            })
+            console.log("whoAmI:执行")
+            const resp = await userAPI.whoAmI()
+            ctx.commit('setLoading',true)
+            if (resp.data.errno === 408){
+                console.log("找到用户了",resp.data.data)
+                ctx.commit('setUser',resp.data.data)
+            } else {
+                console.log("找不到用户")
+                ctx.commit('setUser',null)
+            }
+            ctx.commit('setLoading',false)
+
         }
     }
 

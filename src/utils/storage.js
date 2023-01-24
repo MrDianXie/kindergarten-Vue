@@ -3,11 +3,12 @@
 var storage = {
     set(key, value) {
         sessionStorage.setItem(key, JSON.stringify(value))
-        // localStorage.setItem();
     },
     get(key) {
         return JSON.parse(sessionStorage.getItem(key));
     },
+
+
     getForIndex(index) {
         return sessionStorage.key(index);
     },

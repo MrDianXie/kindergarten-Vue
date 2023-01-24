@@ -47,22 +47,27 @@ const router = new VueRouter({
  */
 router.beforeEach((to, from, next) => {
 
+  //获取token
   const token = store.getters['loginUser/getToken'];
-
   //判断是否要导航确认
   if (to.meta.auth){
+
+    //获取登录状态
+    const status = store.getters['loginUser/getStatus'];
     //判断是否存在token
-    if (token != null){//token存在
+    if (token !== null){//token存在
       //验证token的有效性
-      store.dispatch('loginUser/whoAmI',token)
-      const userInfo = store.getters['loginUser/getUserInfo']
-      if (userInfo !== null){
-        next()
-      } else {
-        next("/?result=unlogin")
+      if (status === 'loading'){//登录中
+        console.log("状态",status)
+      } else if (status === 'login'){//已登陆
+        console.log("状态",status)
+          next()
+      } else{//未登录
+        console.log("状态",status)
+          next("/?result=unlogin")
       }
     } else {//token不存在
-      //用户未登录  跳转到登录页面
+      //跳转到登录页面
       next("/?result=unlogin")
     }
   } else {
@@ -70,5 +75,6 @@ router.beforeEach((to, from, next) => {
   }
 
 })
+
 
 export default router
