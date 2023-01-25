@@ -29,10 +29,13 @@ export async function getVerCode(index){
     };
 }
 
-
+/**
+ * 检验是否登录
+ * @returns {Promise<*>}
+ */
 export async function whoAmI(){
     return await axios({
-        method: 'POST',
+        method: 'GET',
         headers:{
             'X-Admin-Token': store.getters['loginUser/getToken']
         },

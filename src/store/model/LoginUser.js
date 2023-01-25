@@ -151,7 +151,6 @@ export default {
          * @returns {Promise<void>}
          */
         async whoAmI(ctx){
-
             console.log("whoAmI:执行")
             const resp = await userAPI.whoAmI()
             ctx.commit('setLoading',true)

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import store from "@/store";
 
 Vue.use(VueRouter)
 
@@ -51,7 +52,6 @@ router.beforeEach((to, from, next) => {
   const token = store.getters['loginUser/getToken'];
   //判断是否要导航确认
   if (to.meta.auth){
-
     //获取登录状态
     const status = store.getters['loginUser/getStatus'];
     //判断是否存在token

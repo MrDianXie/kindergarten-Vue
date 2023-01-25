@@ -18,7 +18,7 @@ const store = new Vuex.Store({
   plugins:[
       set({
         key: 'pc-store',
-        paths: ['loginUser.user']
+        paths: ['loginUser.user','teacher']
       })
   ]
 
