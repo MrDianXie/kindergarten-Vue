@@ -94,7 +94,7 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: 'admin123',
+        password: '123',
         autoLogin: false,
         code: ""
       },

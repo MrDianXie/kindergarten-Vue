@@ -7,62 +7,77 @@
       <el-button class="btn" @click="search" type="primary" icon="el-icon-search">搜索</el-button>
       <el-button class="btn" @click="dialog = true" type="primary" icon="el-icon-plus">新增</el-button>
     </div>
+      <el-table
+          :highlight-current-row="true"
+          :height="610"
+          ref="filterTable"
+          @selection-change="handleSelectionChange"
+          v-loading="loading"
+          element-loading-text="拼命加载中"
+          element-loading-spinner="el-icon-loading"
+          element-loading-background="rgba(192, 192, 192, 0.8)"
+          :data="teacherList"
+          style="width: 100%">
+        <el-table-column type="selection"></el-table-column>
+        <el-table-column type="index" label="序号" sortable column-key="date"></el-table-column>
+        <el-table-column
+            prop="username"
+            label="姓名">
+        </el-table-column>
+        <el-table-column
+            prop="gander"
+            label="性别"
+            >
+        </el-table-column>
+        <el-table-column
+            prop="phone"
+            width="120"
+            label="手机号码"
+            >
+        </el-table-column>
+        <el-table-column
+            prop="email"
+            width="185"
+            label="电子邮箱"
+            >
+        </el-table-column>
+        <el-table-column
+            prop="createTime"
+            width="180"
+            label="创建时间">
+        </el-table-column>
+        <el-table-column
+            width="180"
+            prop="updateTime"
+            label="修改时间">
+        </el-table-column>
 
+        <el-table-column label="操作" width="180">
+          <template slot-scope="scope">
+            <el-button
+                size="mini"
+                @click="">编辑</el-button>
+            <el-button
+                size="mini"
+                type="danger"
+                @click="">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
 
+      <div class="page">
+        <!-- 分页  -->
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="pager.total"
+            @current-change="loadList"
+            :current-page.sync="pager.page"
 
-    <el-table
-        :highlight-current-row="true"
-        :height="775"
-        class="table"
-        ref="filterTable"
-        :data="teacherList"
-        style="width: 100%">
-      <el-table-column type="selection"></el-table-column>
-      <el-table-column prop="uid" label="教师id" sortable column-key="date"></el-table-column>
-      <el-table-column
-          prop="username"
-          label="姓名">
-      </el-table-column>
-      <el-table-column
-          prop="gander"
-          label="性别"
-          >
-      </el-table-column>
-      <el-table-column
-          prop="phone"
-          width="150"
-          label="手机号码"
-          >
-      </el-table-column>
-      <el-table-column
-          prop="email"
-          width="180"
-          label="电子邮箱"
-          >
-      </el-table-column>
-      <el-table-column
-          prop="createTime"
-          width="180"
-          label="创建时间">
-      </el-table-column>
-      <el-table-column
-          width="180"
-          prop="updateTime"
-          label="修改时间">
-      </el-table-column>
+        >
 
-      <el-table-column label="操作" width="180">
-        <template slot-scope="scope">
-          <el-button
-              size="mini"
-              @click="">编辑</el-button>
-          <el-button
-              size="mini"
-              type="danger"
-              @click="">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+        </el-pagination>
+      </div>
 
 
     <!--  新增  -->
@@ -131,10 +146,10 @@ export default {
   name: "TeacherList",
 
   created() {
-    this.$store.dispatch('teacher/teacherList')
-    this.teacherList = this.$store.getters['teacher/getList']
+    this.loadList()
   },
   data() {
+
     return {
       table: false,
       dialog: false,
@@ -148,41 +163,68 @@ export default {
       formLabelWidth: '80px',
       timer: null,
       teacherList: [],
+
+      pager:{
+        page: 1,
+        total: 0,
+      },
+
       selectKey: '',
 
+      multipleSelection: [],
     }
   },
+
   methods: {
+
+
     /**
      * 查询
      */
-    search() {
-      console.log("执行查询")
-      this.$store.dispatch('teacher/selectTeacher', this.selectKey);
-      this.teacherList = this.$store.getters['teacher/getList']
+    async search() {
+      this.loading = true;
+      await this.$store.dispatch('teacher/selectTeacher', this.selectKey);
+      setTimeout(()=>{
+        this.loading = false
+        this.teacherList = this.$store.getters['teacher/getList']
+      },1000)
+
     },
 
 
-    handleClose(done) {
+    async handleClose(done) {
       if (this.loading) {
         return;
       }
-      this.$confirm('确定要提交表单吗？')
-          .then(_ => {
-            console.log("提交")
-            this.$store.dispatch('teacher/insert',this.form)
+      await this.$confirm('确定要提交表单吗？')
+        .then(_ => {
+          console.log("提交")
+          if (this.form.username !== ''
+              && this.form.email !== ''
+              && this.form.phone !== ''
+              && this.form.gander !== ''
+          ) {
+            this.$store.dispatch('teacher/insert', this.form)
             this.loading = true;
-            this.timer = setTimeout(() => {
-              done();
+          }
+          this.timer = setTimeout(() => {
+            done();
+            // 动画关闭需要一定的时间
+            setTimeout(() => {
+              this.loading = false;
+              // console.log('更新list',this.$store.getters['teacher/getList'])
+              this.loadList()
+              //清空form
+              this.form = []
+            }, 400);
+          }, 2000);
 
-              // 动画关闭需要一定的时间
-              setTimeout(() => {
-                this.loading = false;
-              }, 400);
-            }, 2000);
-          })
-          .catch(_ => {
-          });
+
+      }).catch(_ => {
+
+      });
+
+
     },
     cancelForm() {
       this.loading = false;
@@ -190,20 +232,45 @@ export default {
       clearTimeout(this.timer);
     },
 
+    toggleSelection(rows) {
+      if (rows) {
+        rows.forEach(row => {
+          this.$refs.multipleTable.toggleRowSelection(row);
+        });
+      } else {
+        this.$refs.multipleTable.clearSelection();
+      }
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+      console.log(this.multipleSelection)
+    },
+
+
+    /**
+     * 加载列表
+     * @returns {Promise<void>}
+     */
+    async loadList(){
+      await this.$store.dispatch('teacher/teacherList',this.pager.page)
+      this.teacherList = this.$store.getters['teacher/getList']
+      this.pager.total = this.$store.getters['teacher/getPageTotal']
+    }
 
   },
-
-
-
-
-
 }
 
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 
-
+  .page{
+    background-color: #ffffff;
+    padding-top: 30px;
+    height: 85px;
+    display: flex;
+    justify-content: center;
+  }
 
   .drawer{
     display: flex;

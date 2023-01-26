@@ -2,19 +2,23 @@
  * 获取教师列表API
  * @returns {Promise<void>}
  */
-import qs from 'qs';
 
 /**
  * 获取教师列表
  * @author XIE
+ * @param page
  * @returns {Promise<*>}
  */
-export async function getTeacherList(){
+export async function getTeacherList(page){
     return axios({
         method: 'GET',
         url: 'http://localhost:8090/admin/teacher/teacherList',
         headers: {
             'X-Admin-Token': store.getters['loginUser/getToken']
+        },
+        params:{
+            current:page,
+            size:10
         }
     })
 }
@@ -22,18 +26,20 @@ export async function getTeacherList(){
 /**
  * 通过名字查询教师
  * @author XIE
- * @param teacherInfo
+ * @param selectKey
  * @returns {Promise<*>}
  */
 export async function selectTeacher(selectKey){
+
     return axios({
         method : 'GET',
         headers: {
-            'content-type': 'application/x-www-form-urlencoded',
             'X-Admin-Token': store.getters['loginUser/getToken']
         },
         url: 'http://localhost:8090/admin/teacher/selectTeacher',
-        data : qs.stringify({selectKey : selectKey}),
+        params: {
+            selectKey: selectKey
+        }
     })
 }
 
