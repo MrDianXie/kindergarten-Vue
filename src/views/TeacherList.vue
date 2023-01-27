@@ -3,7 +3,12 @@
 
 
     <div class="input-search">
-      <el-input class="input" @keyup.native.enter="search" :clearable="true" placeholder="请输入搜索内容(名字/手机号码/助记码)" prefix-icon="el-icon-search" v-model="selectKey" ></el-input>
+      <el-input class="input"
+                @keyup.native.enter="search"
+                :clearable="true"
+                placeholder="请输入搜索内容(名字/手机号码/助记码)"
+                prefix-icon="el-icon-search"
+                v-model="pager.selectKey" ></el-input>
       <el-button class="btn" @click="search" type="primary" icon="el-icon-search">搜索</el-button>
       <el-button class="btn" @click="dialog = true" type="primary" icon="el-icon-plus">新增</el-button>
     </div>
@@ -57,10 +62,21 @@
             <el-button
                 size="mini"
                 @click="">编辑</el-button>
-            <el-button
-                size="mini"
-                type="danger"
-                @click="">删除</el-button>
+            <el-popconfirm
+                confirm-button-text='确定'
+                cancel-button-text='取消'
+                icon="el-icon-info"
+                icon-color="red"
+                :title="'确定删除'+ scope.row.username +'的信息吗？'"
+                class="del-btn"
+                @confirm="del(scope.row.uid)"
+            >
+              <el-button
+                  size="mini"
+                  type="danger"
+                  slot="reference"
+              >删除</el-button>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
@@ -167,29 +183,48 @@ export default {
       pager:{
         page: 1,
         total: 0,
+        size: 10,
+        selectKey: '',
       },
-
-      selectKey: '',
-
       multipleSelection: [],
     }
   },
 
+  watch:{
+    pager:{
+      handler(val){
+        if (val.selectKey === '' || val.selectKey === null){
+          this.loadList()
+        }
+      },
+      //开启深度监听
+      deep:true
+    }
+
+  },
+
   methods: {
 
-
+    async del(uid){
+      await this.$store.dispatch('teacher/del',uid);
+      //更新一下列表
+      this.loadList()
+      alert("删除成功")
+    },
     /**
-     * 查询
+     * 条件查询（模糊）
      */
     async search() {
       this.loading = true;
-      await this.$store.dispatch('teacher/selectTeacher', this.selectKey);
+      console.log(this.selectKey)
+      await this.$store.dispatch('teacher/selectTeacher',this.pager);
       setTimeout(()=>{
         this.loading = false
         this.teacherList = this.$store.getters['teacher/getList']
       },1000)
 
     },
+
 
 
     async handleClose(done) {
@@ -252,7 +287,7 @@ export default {
      * @returns {Promise<void>}
      */
     async loadList(){
-      await this.$store.dispatch('teacher/teacherList',this.pager.page)
+      await this.$store.dispatch('teacher/teacherList',this.pager)
       this.teacherList = this.$store.getters['teacher/getList']
       this.pager.total = this.$store.getters['teacher/getPageTotal']
     }
@@ -263,6 +298,14 @@ export default {
 </script>
 
 <style lang="less">
+
+  .el-popconfirm__main{
+    color: deepskyblue;
+  }
+
+  .del-btn{
+    margin-left: 10px;
+  }
 
   .page{
     background-color: #ffffff;
