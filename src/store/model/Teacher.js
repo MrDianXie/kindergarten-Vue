@@ -7,10 +7,12 @@ export default {
 
 
     state:{
-        list: [],
-        loading: false,
+        list: [], //教师列表
+        loading: false, //加载状态
         pageTotal: null,//总页数
         page: null,//当前页
+        result: null, //返回结果
+        teacher: null, //单个教师
     },
 
     mutations: {
@@ -25,11 +27,23 @@ export default {
 
         setPageTotal(state,payload){
             state.pageTotal = payload
+        },
+
+        setResult(state,payload){
+            state.result = payload;
+        },
+
+        setTeacher(state,teacher){
+            state.teacher = teacher;
         }
 
     },
 
     getters: {
+
+        getTeacher(state){
+            return state.teacher;
+        },
 
         getList(state){
             return state.list;
@@ -42,11 +56,51 @@ export default {
 
         getPageTotal(state){
             return state.pageTotal;
+        },
+
+        getDelResult(state){
+            return state.result
         }
 
     },
 
     actions: {
+
+        /**
+         * 更新教师信息
+         * @param ctx
+         * @param teacher 教师信息
+         * @returns {Promise<void>}
+         */
+        async update(ctx,teacher){
+            ctx.commit('setLoading',true);
+            const resp = await teacherAPI.update(teacher);
+            storage.set('token',resp.data.data.token)
+            if (resp.data.errno === 408){
+                ctx.commit('setResult',true);
+            } else {
+                ctx.commit('setResult',false);
+            }
+            ctx.commit('setLoading',false);
+        },
+
+        /**
+         * 批量删除
+         * @param ctx
+         * @param uids 用户ids
+         * @returns {Promise<void>}
+         */
+        async delAll(ctx,uids){
+            ctx.commit('setLoading',true);
+            const resp = await teacherAPI.delAll(uids);
+            storage.set('token',resp.data.data.token)
+            if (resp.data.errno === 408){
+                ctx.commit('setResult',true);
+            } else {
+                ctx.commit('setResult',false);
+            }
+            ctx.commit('setLoading',false);
+        },
 
         /**
          * 通过id删除一条教师信息
@@ -57,8 +111,15 @@ export default {
             //设置加载状态
             ctx.commit('setLoading',true)
             const resp = await teacherAPI.del(uid);
-            console.log("响应结果",resp)
-            ctx.commit('setLoading',false)
+            console.log("响应结果",resp);
+            //更新缓存的token
+            storage.set('token',resp.data.data.token)
+            if (resp.data.errno === 408){
+                ctx.commit('setResult',true);
+            } else {
+                ctx.commit('setResult',false);
+            }
+            ctx.commit('setLoading',false);
         },
 
         /**
@@ -117,15 +178,34 @@ export default {
          * @returns {Promise<void>}
          */
         async insert(ctx,teacher){
-
             ctx.commit('setLoading',true)
             const resp = await teacherAPI.insert(teacher);
+            storage.set("token",resp.data.data.token)
             if (resp.data.errno === 408){
                 console.log("新增成功")
             } else {
                 console.log("新增失败")
             }
 
+            ctx.commit('setLoading',false)
+        },
+
+        /**
+         * 通过id查询教师
+         * @param ctx
+         * @param uid 教师id
+         * @returns {Promise<void>}
+         */
+        async selectById(ctx,uid){
+            ctx.commit('setLoading',true)
+            const resp = await teacherAPI.selectById(uid);
+            storage.set("token",resp.data.data.token)
+            if (resp.data.errno === 408){
+                ctx.commit('setTeacher',resp.data.data.teacher)
+            } else {
+                console.log("操作失败")
+                return;
+            }
             ctx.commit('setLoading',false)
         }
     },

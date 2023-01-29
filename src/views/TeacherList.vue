@@ -2,16 +2,39 @@
   <layout>
 
 
-    <div class="input-search">
-      <el-input class="input"
-                @keyup.native.enter="search"
-                :clearable="true"
-                placeholder="请输入搜索内容(名字/手机号码/助记码)"
-                prefix-icon="el-icon-search"
-                v-model="pager.selectKey" ></el-input>
-      <el-button class="btn" @click="search" type="primary" icon="el-icon-search">搜索</el-button>
-      <el-button class="btn" @click="dialog = true" type="primary" icon="el-icon-plus">新增</el-button>
+    <div class="header">
+      <div class="bread">
+        <el-breadcrumb separator-class="el-icon-arrow-right">
+          <el-breadcrumb-item :to="{ name:'home' }">首页</el-breadcrumb-item>
+          <el-breadcrumb-item>教师管理</el-breadcrumb-item>
+          <el-breadcrumb-item>教师列表</el-breadcrumb-item>
+        </el-breadcrumb>
+      </div>
+      <div class="input-search">
+        <el-input class="input"
+                  @keyup.native.enter="search"
+                  :clearable="true"
+                  placeholder="请输入搜索内容(名字/手机号码/助记码)"
+                  prefix-icon="el-icon-search"
+                  v-model="pager.selectKey" ></el-input>
+        <el-button class="btn" @click="search" type="primary" icon="el-icon-search">搜索</el-button>
+        <el-button class="btn" @click="insert" type="primary" icon="el-icon-plus">新增</el-button>
+        <template>
+          <el-popconfirm
+              confirm-button-text='确定'
+              cancel-button-text='取消'
+              icon="el-icon-info"
+              icon-color="red"
+              slot="reference"
+              :title="'确定批量删除吗？'"
+              @confirm="delAll()"
+          >
+            <el-button slot="reference" class="btn" type="danger" icon="el-icon-delete">批量删除</el-button>
+          </el-popconfirm>
+        </template>
+      </div>
     </div>
+
       <el-table
           :highlight-current-row="true"
           :height="610"
@@ -61,7 +84,7 @@
           <template slot-scope="scope">
             <el-button
                 size="mini"
-                @click="">编辑</el-button>
+                @click="update(scope.row.uid)">编辑</el-button>
             <el-popconfirm
                 confirm-button-text='确定'
                 cancel-button-text='取消'
@@ -99,12 +122,10 @@
     <!--  新增  -->
     <el-drawer
         class="drawer"
-        title="新增教师"
+        :title="this.handleTitle === 'insert' ? '新增教师':'修改教师信息'"
         :size="'50%'"
-        :before-close="handleClose"
         :visible.sync="dialog"
         direction="ltr"
-
         custom-class="demo-drawer"
         ref="drawer"
     >
@@ -147,7 +168,7 @@
           </el-form>
           <div class="demo-drawer__footer">
             <el-button class="btn" @click="cancelForm">取 消</el-button>
-            <el-button class="btn" type="primary" @click="$refs.drawer.closeDrawer()" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+            <el-button class="btn" type="primary" @click="handleClose()" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
           </div>
         </div>
       </div>
@@ -169,8 +190,10 @@ export default {
     return {
       table: false,
       dialog: false,
+      handleTitle: '',
       loading: false,
       form: {
+        uid: null,
         username: '',
         gander: '',
         phone: null,
@@ -205,11 +228,73 @@ export default {
 
   methods: {
 
+
+    /**
+     * 修改教师信息
+     */
+    async update(uid){
+      this.dialog = true;
+      this.handleTitle = 'update'
+      //通过id将要修改的教师
+      await this.$store.dispatch('teacher/selectById',uid);
+      //将教师信息传到form里
+      var teacher = this.$store.getters['teacher/getTeacher'];
+      this.form.username = teacher.username;
+      this.form.gander = teacher.gander;
+      this.form.phone = parseInt(teacher.phone);
+      this.form.email = teacher.email;
+      this.form.uid = teacher.uid;
+      console.log('form',this.form)
+    },
+
+    /**
+     * 批量删除
+     */
+    async delAll(){
+      // console.log("users",this.multipleSelection)
+      var uids = '';
+      this.multipleSelection.forEach(user => {
+        console.log(user.uid)
+        uids = uids + user.uid + '-';
+      })
+
+      await this.$store.dispatch('teacher/delAll',uids);
+      const result = this.$store.getters['teacher/getDelResult'];
+      if (result){
+        this.$message({
+          showClose: true,
+          message: '删除成功',
+          type: 'success'
+        });
+      } else {
+        this.$message({
+          showClose: true,
+          message: '删除失败',
+          type: 'error'
+        });
+      }
+      this.loadList()
+
+    },
+
     async del(uid){
       await this.$store.dispatch('teacher/del',uid);
       //更新一下列表
+      const result = this.$store.getters['teacher/getDelResult'];
+      if (result){
+        this.$message({
+          showClose: true,
+          message: '删除成功',
+          type: 'success'
+        });
+      } else {
+        this.$message({
+          showClose: true,
+          message: '删除失败',
+          type: 'error'
+        });
+      }
       this.loadList()
-      alert("删除成功")
     },
     /**
      * 条件查询（模糊）
@@ -225,9 +310,18 @@ export default {
 
     },
 
+    insert(){
+      this.dialog = true;
+      this.handleTitle = 'insert'
+    },
 
 
-    async handleClose(done) {
+
+    /**
+     * 打开新增/修改
+     */
+    async handleClose() {
+      console.log('form',this.form)
       if (this.loading) {
         return;
       }
@@ -239,46 +333,54 @@ export default {
               && this.form.phone !== ''
               && this.form.gander !== ''
           ) {
-            this.$store.dispatch('teacher/insert', this.form)
+            console.log("title",this.handleTitle)
+            if (this.handleTitle === 'insert'){
+              //新增
+              this.$store.dispatch('teacher/insert', this.form)
+            } else if (this.handleTitle === 'update'){
+              //修改
+              this.$store.dispatch('teacher/update',this.form)
+            }
             this.loading = true;
+          } else if (this.form.username === ''
+              || this.form.email === ''
+              || this.form.phone === ''
+              || this.form.gander === ''
+          ) {
+            this.$message({
+              showClose: true,
+              message: '请输入完整的教师信息',
+              type: 'error'
+            });
+            return;
           }
           this.timer = setTimeout(() => {
-            done();
             // 动画关闭需要一定的时间
             setTimeout(() => {
               this.loading = false;
               // console.log('更新list',this.$store.getters['teacher/getList'])
               this.loadList()
               //清空form
-              this.form = []
+              if (this.handleTitle === 'insert'){
+                this.form = {}
+              } else {
+                this.dialog = false;
+              }
             }, 400);
           }, 2000);
 
-
-      }).catch(_ => {
-
       });
-
-
     },
+
+
     cancelForm() {
       this.loading = false;
       this.dialog = false;
       clearTimeout(this.timer);
     },
 
-    toggleSelection(rows) {
-      if (rows) {
-        rows.forEach(row => {
-          this.$refs.multipleTable.toggleRowSelection(row);
-        });
-      } else {
-        this.$refs.multipleTable.clearSelection();
-      }
-    },
     handleSelectionChange(val) {
       this.multipleSelection = val;
-      console.log(this.multipleSelection)
     },
 
 
@@ -298,6 +400,38 @@ export default {
 </script>
 
 <style lang="less">
+
+  .header{
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+
+    .bread{
+      padding-top: 30px;
+      padding-left: 20px;
+      width: 50%;
+    }
+    .input-search{
+      line-height: 80px;
+      width: 100%;
+      height: 80px;
+      display: flex;
+      justify-content: right;
+      //justify-content: space-between;
+      background-color: #ffffff;
+
+      .input{
+        margin-right: 30px;
+        width: 200px;
+      }
+
+      .btn{
+        margin-top: 20px;
+        margin-right: 30px;
+        height: 40px;
+      }
+    }
+  }
 
   .el-popconfirm__main{
     color: deepskyblue;
@@ -337,24 +471,6 @@ export default {
     text-align: center;
   }
 
-  .input-search{
-    line-height: 80px;
-    width: 100%;
-    height: 80px;
-    display: flex;
-    justify-content: right;
-    background-color: #ffffff;
 
-    .input{
-      margin-right: 30px;
-      width: 200px;
-    }
-
-    .btn{
-      margin-top: 20px;
-      margin-right: 30px;
-      height: 40px;
-    }
-  }
 
 </style>

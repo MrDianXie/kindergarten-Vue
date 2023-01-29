@@ -1,3 +1,42 @@
+/**
+ * 更新教师信息
+ * @param teacher 教师信息
+ * @returns {Promise<*>}
+ */
+export async function update(teacher){
+    return axios({
+        method:'PUT',
+        url:'http://localhost:8090/admin/teacher/update',
+        headers: {
+            'X-Admin-Token': store.getters['loginUser/getToken']
+        },
+        data:{
+            uid: teacher.uid,
+            username: teacher.username,
+            gander: teacher.gander,
+            email: teacher.email,
+            phone: teacher.phone
+        }
+    })
+}
+
+/**
+ * 批量删除教师
+ * @param uids 用户ids
+ * @returns {Promise<void>}
+ */
+export async function delAll(uids){
+    return axios({
+        method: 'DELETE',
+        url:'http://localhost:8090/admin/teacher/deleteAll',
+        headers: {
+            'X-Admin-Token': store.getters['loginUser/getToken']
+        },
+        params:{
+            uids: uids
+        }
+    })
+}
 
 /**
  * 获取教师列表
@@ -20,9 +59,26 @@ export async function getTeacherList(pager){
 }
 
 /**
+ *  通过id查询教师
+ * @param uid 教师id
+ * @returns {Promise<void>}
+ */
+export async function selectById(uid){
+    return axios ({
+        method:'GET',
+        url:'http://localhost:8090/admin/teacher/selectById',
+        headers: {
+            'X-Admin-Token': store.getters['loginUser/getToken'],
+        },
+        params:{
+            uid:uid
+        }
+    })
+}
+
+/**
  * 通过名字查询教师
  * @author XIE
- * @param selectKey 查询条件
  * @param pager 分页数据
  * @returns {Promise<*>}
  */

@@ -7,9 +7,19 @@
       </span>
 
       <span>
-
         <el-avatar :size="40" :src="avatarUrl"></el-avatar>
-        <i>{{ 'admin' }}</i>
+        <el-col :span="16">
+          <el-dropdown>
+            <span class="el-dropdown-link">
+              <i class="el-icon-arrow-down el-icon--right" style="color: #000">{{ 'admin' }}</i>
+            </span>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item icon="el-icon-user">个人信息</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-edit">修改密码</el-dropdown-item>
+              <el-dropdown-item icon="el-icon-switch-button">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </el-col>
       </span>
     </el-header>
     <el-container class="container">
@@ -31,7 +41,7 @@
 
             <el-submenu index="1">
               <template slot="title">
-                <i class="el-icon-location"></i>
+                <i class="el-icon-tickets"></i>
                 <span>公告管理</span>
               </template>
 
@@ -43,7 +53,7 @@
 
             <el-submenu index="2">
               <template slot="title">
-                <i class="el-icon-location"></i>
+                <i class="el-icon-s-check"></i>
                 <span>教师管理</span>
               </template>
               <el-menu-item-group>
@@ -54,7 +64,7 @@
 
             <el-submenu index="3">
               <template slot="title">
-                <i class="el-icon-location"></i>
+                <i class="el-icon-postcard"></i>
                 <span>学生管理</span>
               </template>
               <el-menu-item-group>
@@ -65,7 +75,7 @@
 
             <el-submenu index="4">
               <template slot="title">
-                <i class="el-icon-location"></i>
+                <i class="el-icon-s-data"></i>
                 <span>班级管理</span>
               </template>
               <el-menu-item-group>
@@ -76,7 +86,7 @@
 
             <el-submenu index="5">
               <template slot="title">
-                <i class="el-icon-location"></i>
+                <i class="el-icon-s-custom"></i>
                 <span>角色管理</span>
               </template>
               <el-menu-item-group>
