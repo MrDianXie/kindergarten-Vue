@@ -120,7 +120,7 @@ export default {
 
 
         /**
-         *
+         * 登录
          * @param ctx
          * @param loginInfo
          * @returns {Promise<void>}
@@ -147,6 +147,7 @@ export default {
         },
 
         /**
+         * 身份验证
          * @param ctx
          * @returns {Promise<void>}
          */
@@ -157,6 +158,8 @@ export default {
             if (resp.data.errno === 408){
                 console.log("找到用户了",resp.data.data)
                 ctx.commit('setUser',resp.data.data)
+                console.log("who",resp.data.data)
+
             } else {
                 console.log("找不到用户")
                 ctx.commit('setUser',null)
