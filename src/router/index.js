@@ -34,6 +34,15 @@ const routes = [
       auth: true
     }
 
+  },
+  {
+    path: '/admin/studentList',
+    name: 'studentList',
+    component: () => import("@/views/StudentList"),
+    meta:{
+      auth: true
+    }
+
   }
 ]
 
@@ -49,11 +58,11 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
 
   //获取token
-  const token = store.getters['loginUser/getToken'];
+  const token = store.getters['User/getToken'];
   //判断是否要导航确认
   if (to.meta.auth){
     //获取登录状态
-    const status = store.getters['loginUser/getStatus'];
+    const status = store.getters['User/getStatus'];
     //判断是否存在token
     if (token !== null){//token存在
       //验证token的有效性

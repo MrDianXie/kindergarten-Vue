@@ -37,7 +37,7 @@ export async function whoAmI(){
     return await axios({
         method: 'GET',
         headers:{
-            'X-Admin-Token': store.getters['loginUser/getToken']
+            'X-Admin-Token': store.getters['User/getToken']
         },
         url: 'http://localhost:8090/admin/home/whoAmI'
     })

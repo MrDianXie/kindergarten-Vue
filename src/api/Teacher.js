@@ -8,7 +8,7 @@ export async function update(teacher){
         method:'PUT',
         url:'http://localhost:8090/admin/teacher/update',
         headers: {
-            'X-Admin-Token': store.getters['loginUser/getToken']
+            'X-Admin-Token': store.getters['User/getToken']
         },
         data:{
             uid: teacher.uid,
@@ -30,7 +30,7 @@ export async function delAll(uids){
         method: 'DELETE',
         url:'http://localhost:8090/admin/teacher/deleteAll',
         headers: {
-            'X-Admin-Token': store.getters['loginUser/getToken']
+            'X-Admin-Token': store.getters['User/getToken']
         },
         params:{
             uids: uids
@@ -49,7 +49,7 @@ export async function getTeacherList(pager){
         method: 'GET',
         url: 'http://localhost:8090/admin/teacher/teacherList',
         headers: {
-            'X-Admin-Token': store.getters['loginUser/getToken']
+            'X-Admin-Token': store.getters['User/getToken']
         },
         params:{
             current:pager.page,
@@ -68,7 +68,7 @@ export async function selectById(uid){
         method:'GET',
         url:'http://localhost:8090/admin/teacher/selectById',
         headers: {
-            'X-Admin-Token': store.getters['loginUser/getToken'],
+            'X-Admin-Token': store.getters['User/getToken'],
         },
         params:{
             uid:uid
@@ -86,7 +86,7 @@ export async function selectTeacher(pager){
     return axios({
         method : 'GET',
         headers: {
-            'X-Admin-Token': store.getters['loginUser/getToken'],
+            'X-Admin-Token': store.getters['User/getToken'],
         },
         url: 'http://localhost:8090/admin/teacher/selectTeacher',
         params: {
@@ -107,7 +107,7 @@ export async function insert(teacher) {
     return axios({
         method: 'POST',
         headers: {
-            'X-Admin-Token': store.getters['loginUser/getToken']
+            'X-Admin-Token': store.getters['User/getToken']
         },
         url:'http://localhost:8090/admin/teacher/insert',
         data: {
@@ -131,7 +131,7 @@ export async function del(uid) {
         method: 'DELETE',
         url:'http://localhost:8090/admin/teacher/delete',
         headers:{
-            'X-Admin-Token': store.getters['loginUser/getToken']
+            'X-Admin-Token': store.getters['User/getToken']
         },
         params:{
             uid: uid

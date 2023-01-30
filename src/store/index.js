@@ -1,8 +1,10 @@
 
 import Vue from 'vue'
 import Vuex from 'vuex'
-import loginUser from './model/LoginUser'
+import User from './model/User'
 import teacher from "@/store/model/Teacher";
+import student from '@/store/model/Student'
+import classAndGrade from '@/store/model/Classandgrade'
 import set from 'vuex-persistedstate'
 
 Vue.use(Vuex);
@@ -11,14 +13,16 @@ const store = new Vuex.Store({
 
   //将各模块引入
   modules:{
-    loginUser,
+    User,
     teacher,
+    student,
+    classAndGrade,
   },
 
   plugins:[
       set({
         key: 'pc-store',
-        paths: ['loginUser.user','teacher']
+        paths: ['User.user','teacher','student','classAndGrade']
       })
   ]
 

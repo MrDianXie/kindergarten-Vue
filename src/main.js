@@ -15,7 +15,7 @@ Vue.use(VueParticles)
 
 Vue.component("Layout",Layout)
 Vue.use(router)
-store.dispatch("loginUser/whoAmI")
+store.dispatch("User/whoAmI")
 Vue.config.productionTip = false
 
 new Vue({

@@ -99,7 +99,7 @@ export default {
         code: ""
       },
 
-      codeURL:this.$store.getters["loginUser/getCode"],
+      codeURL:this.$store.getters["User/getCode"],
       index: 1,
 
       resultInfo: {
@@ -133,16 +133,16 @@ export default {
      * 更改验证码
      */
     changeCode(){
-      this.$store.dispatch("loginUser/changeCode",this.index++);
-      this.codeURL = this.$store.getters["loginUser/getCode"];
+      this.$store.dispatch("User/changeCode",this.index++);
+      this.codeURL = this.$store.getters["User/getCode"];
       console.log(this.codeURL);
     },
     async login() {
       //发送请求
-      await this.$store.dispatch('loginUser/login',this.loginForm)
+      await this.$store.dispatch('User/login',this.loginForm)
       //获取响应结果
-      console.log('登录响应码',this.$store.getters['loginUser/getLoginResult'])
-      const result = this.$store.getters['loginUser/getLoginResult']
+      console.log('登录响应码',this.$store.getters['User/getLoginResult'])
+      const result = this.$store.getters['User/getLoginResult']
 
       if (result === '登录成功'){
         const loading = this.$loading({

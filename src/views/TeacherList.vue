@@ -1,7 +1,5 @@
 <template>
   <layout>
-
-
     <div class="header">
       <div class="bread">
         <el-breadcrumb separator-class="el-icon-arrow-right">
