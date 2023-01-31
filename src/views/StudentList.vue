@@ -96,9 +96,9 @@
               cancel-button-text='取消'
               icon="el-icon-info"
               icon-color="red"
-              :title="'确定删除'+ scope.row.username +'的信息吗？'"
+              :title="'确定删除'+ scope.row.sname +'的信息吗？'"
               class="del-btn"
-              @confirm="del(scope.row.uid)"
+              @confirm="del(scope.row.sid)"
           >
             <el-button
                 size="mini"
@@ -137,7 +137,7 @@
     >
       <div class="demo-drawer__content">
         <div class="form">
-          <el-form :model="form">
+          <el-form :model="form" :rules="rules" ref="form">
             <el-form-item
                 label="学生姓名"
                 :label-width="formLabelWidth"
@@ -150,14 +150,20 @@
                 :label-width="formLabelWidth"
                 prop="age"
             >
-            <el-input show-word-limit v-model.number="form.age" autocomplete="off"></el-input>
+            <el-input maxlength="2" show-word-limit v-model.number="form.age" autocomplete="off"></el-input>
             </el-form-item>
-            <el-form-item label="家庭地址" :label-width="formLabelWidth">
+            <el-form-item
+                label="家庭地址"
+                :label-width="formLabelWidth"
+                prop="address"
+            >
               <el-input v-model="form.address" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item
                 label="性别"
-                :label-width="formLabelWidth">
+                :label-width="formLabelWidth"
+                prop="gander"
+            >
               <el-select v-model="form.gander" placeholder="请选择性别">
                 <el-option label="男" value="男"></el-option>
                 <el-option label="女" value="女"></el-option>
@@ -166,7 +172,9 @@
 
             <el-form-item
                 label="班级"
-                :label-width="formLabelWidth">
+                :label-width="formLabelWidth"
+                prop="cid"
+            >
               <el-select v-model="form.cid" filterable placeholder="请选择">
                 <el-option
                     v-for="item in this.classAndGrade"
@@ -176,11 +184,9 @@
                 </el-option>
               </el-select>
             </el-form-item>
-
-
           </el-form>
           <div class="demo-drawer__footer">
-            <el-button class="btn" @click="cancelForm">取 消</el-button>
+            <el-button class="btn" @click="cancelForm()">取 消</el-button>
             <el-button class="btn" type="primary" @click="handleClose()" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
           </div>
         </div>
@@ -201,30 +207,52 @@ export default {
   },
   data() {
     return {
-      table: false,
-      dialog: false,
-      handleTitle: '',
-      loading: false,
-      form: {
-        sname: '',
-        gander: '',
+
+
+      table: false, //模态框标识
+      dialog: false, //是否开启模态框
+      handleTitle: '', //模态框标题
+      loading: false, //家长状态
+      form: { //表单数据
+        sname: null,
+        gander: null,
         age: null,
-        address: '',
+        address: null,
         cid: null,
         uid: null,
       },
-      classAndGrade:[],
+
+      rules: {
+        sname: [
+          { required: true, message: '请输入学生名字', trigger: 'blur' },
+        ],
+        address: [
+          { required: true, message: '请输入学生家庭地址', trigger: 'blur' }
+        ],
+        age: [
+          { type: 'number', required: true, message: '请输入学生年龄', trigger: 'blur' }
+        ],
+        gander: [
+          { required: true, message: '请选择学生性别', trigger: 'change' }
+        ],
+        cid: [
+          { type: 'number', required: true, message: '请选择学生班级', trigger: 'change' }
+        ],
+      },
+
+
+      classAndGrade:[],//班级列表
       formLabelWidth: '80px',
       timer: null,
-      list: [],
+      list: [], //学生列表
 
-      pager:{
+      pager:{ //分页数据
         page: 1,
         total: 0,
         size: 10,
         selectKey: '',
       },
-      multipleSelection: [],
+      multipleSelection: [], //选择列表
     }
   },
 
@@ -292,10 +320,14 @@ export default {
 
     },
 
-    async del(uid){
-      await this.$store.dispatch('teacher/del',uid);
+    /**
+     * 删除单条学生数据
+     * @param sid 学生id
+     * */
+    async del(sid){
+      await this.$store.dispatch('student/del',sid);
       //更新一下列表
-      const result = this.$store.getters['teacher/getDelResult'];
+      const result = await this.$store.getters['student/getResult'];
       if (result){
         this.$message({
           showClose: true,
@@ -330,6 +362,11 @@ export default {
       this.handleTitle = 'insert'
     },
 
+    /**
+     * 清空表单
+     * */
+    resetForm(){},
+
 
 
     /**
@@ -342,33 +379,26 @@ export default {
       }
       await this.$confirm('确定要提交表单吗？')
           .then(_ => {
-            console.log("提交")
-            if (this.form.username !== ''
-                && this.form.email !== ''
-                && this.form.phone !== ''
-                && this.form.gander !== ''
-            ) {
-              console.log("title",this.handleTitle)
-              if (this.handleTitle === 'insert'){
-                //新增
-                this.$store.dispatch('teacher/insert', this.form)
-              } else if (this.handleTitle === 'update'){
-                //修改
-                this.$store.dispatch('teacher/update',this.form)
+            this.$refs['form'].validate((valid) => {
+              if (valid) {
+                if (this.handleTitle === 'insert'){
+                  //新增
+                  this.$store.dispatch('student/insert', this.form)
+                } else if (this.handleTitle === 'update'){
+
+                  //修改
+                  this.$store.dispatch('student/update',this.form)
+                }
+                this.loading = true;
+              } else {
+                this.$message({
+                  showClose: true,
+                  message: '请输入完整的学生信息',
+                  type: 'error'
+                });
+                return false;
               }
-              this.loading = true;
-            } else if (this.form.username === ''
-                || this.form.email === ''
-                || this.form.phone === ''
-                || this.form.gander === ''
-            ) {
-              this.$message({
-                showClose: true,
-                message: '请输入完整的教师信息',
-                type: 'error'
-              });
-              return;
-            }
+            });
             this.timer = setTimeout(() => {
               // 动画关闭需要一定的时间
               setTimeout(() => {
@@ -377,14 +407,20 @@ export default {
                 this.loadList()
                 //清空form
                 if (this.handleTitle === 'insert'){
-                  this.form = {}
+                  if (this.$store.getters["student/getResult"]){
+                    this.$message({
+                      showClose: true,
+                      message: '新增成功',
+                      type: 'success'
+                    });
+                  }
+                  this.$refs['form'].resetFields();
                 } else {
                   this.dialog = false;
                 }
               }, 400);
             }, 2000);
-
-          });
+          }).catch(_ => {});
     },
 
 

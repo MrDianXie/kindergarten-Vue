@@ -144,6 +144,7 @@
                 label="手机号码"
                 :label-width="formLabelWidth"
                 prop="phone"
+                maxlength="2"
                 :rules="[
                   { required: true, message: '手机号码不能为空'},
                   { type: 'number', message: '手机号码必须为数字值'}
@@ -367,7 +368,7 @@ export default {
             }, 400);
           }, 2000);
 
-      });
+      }).catch(_ => {});
     },
 
 

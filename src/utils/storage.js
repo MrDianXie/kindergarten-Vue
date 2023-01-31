@@ -8,6 +8,10 @@ var storage = {
         return JSON.parse(sessionStorage.getItem(key));
     },
 
+    setToken(value){
+        sessionStorage.setItem('token', JSON.stringify(value))
+    },
+
 
     getForIndex(index) {
         return sessionStorage.key(index);

@@ -188,12 +188,16 @@ export default {
 
   created() {
     if (this.$route.query.result === 'unlogin'){
-
       const h = this.$createElement;
-
       this.$notify.error({
         title: '非法操作',
         message: h('i', { style: 'color: red'}, '用户未登录，请先登录！')
+      });
+    } else if (this.$route.query.result === 'overTime'){
+      const h = this.$createElement;
+      this.$notify.error({
+        title: '登录超时',
+        message: h('i', { style: 'color: red'}, '请重新登录！')
       });
     }
   }

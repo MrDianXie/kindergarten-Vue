@@ -1,6 +1,6 @@
 import * as api from '@/api/Student'
-import App from "@/App";
 import storage from "@/utils/storage";
+import * as to from '@/utils/to'
 
 export default {
     namespaced : true,
@@ -31,7 +31,7 @@ export default {
         },
 
         getResult(state) {
-            return state;
+            return state.result;
         },
 
         getPageTotal(state) {
@@ -49,8 +49,9 @@ export default {
          */
         async getStudentList(ctx,pager){
             const resp = await api.getList(pager);
-            storage.set('token',resp.data.data.token);
+            to.overdue(resp);
             if (resp.data.errno === 408){
+                storage.set('token',resp.data.data.token);
                 ctx.commit('setResult',true)
                 ctx.commit('setPageTotal',resp.data.data.total)
                 ctx.commit('setList',resp.data.data.list)
@@ -68,8 +69,9 @@ export default {
          */
         async selectByKey(ctx,pager) {
             const resp = await api.selectByKey(pager);
-            storage.set('token', resp.data.data.token);
+            to.overdue(resp);
             if (resp.data.errno === 408) {
+                storage.set('token', resp.data.data.token);
                 ctx.commit('setResult', true)
                 ctx.commit('setPageTotal', resp.data.data.total)
                 ctx.commit('setList', resp.data.data.list)
@@ -77,6 +79,41 @@ export default {
                 ctx.commit('setResult', false)
             }
 
-        }
+        },
+
+        /**
+         * 新增一条学生数据
+         * @param ctx
+         * @param student
+         * @returns {Promise<void>}
+         */
+        async insert(ctx,student){
+            const resp = await api.insert(student);
+            to.overdue(resp);
+            if (resp.data.errno === 408){
+                storage.set("token",resp.data.data.token);
+                console.log("新增成功")
+                ctx.commit('setResult', true)
+            } else {
+                ctx.commit('setResult', false)
+            }
+        },
+
+        /**
+         * 删除一条学生信息
+         * @param ctx
+         * @param sid
+         * @returns {Promise<void>}
+         */
+        async del(ctx,sid){
+            const resp = await api.del(sid);
+            to.overdue(resp);
+            if (resp.data.errno === 408){
+                storage.set('token',resp.data.data.token)
+                ctx.commit('setResult',true)
+            } else {
+                ctx.commit('setResult',false)
+            }
+        },
     },
 }

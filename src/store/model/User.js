@@ -1,5 +1,6 @@
 import storage from "@/utils/storage";
 import * as userAPI from '@/api/User'
+import * as to from '@/utils/to'
 
 /**
  * 用户登录模块
@@ -156,12 +157,8 @@ export default {
             const resp = await userAPI.whoAmI()
             ctx.commit('setLoading',true)
             if (resp.data.errno === 408){
-                console.log("找到用户了",resp.data.data)
                 ctx.commit('setUser',resp.data.data)
-                console.log("who",resp.data.data)
-
             } else {
-                console.log("找不到用户")
                 ctx.commit('setUser',null)
             }
             ctx.commit('setLoading',false)

@@ -1,4 +1,5 @@
 import * as teacherAPI from '@/api/Teacher'
+import * as to from '@/utils/to'
 import storage from "@/utils/storage";
 
 export default {
@@ -75,8 +76,9 @@ export default {
         async update(ctx,teacher){
             ctx.commit('setLoading',true);
             const resp = await teacherAPI.update(teacher);
-            storage.set('token',resp.data.data.token)
+            to.overdue(resp);
             if (resp.data.errno === 408){
+                storage.set('token',resp.data.data.token)
                 ctx.commit('setResult',true);
             } else {
                 ctx.commit('setResult',false);
@@ -93,8 +95,9 @@ export default {
         async delAll(ctx,uids){
             ctx.commit('setLoading',true);
             const resp = await teacherAPI.delAll(uids);
-            storage.set('token',resp.data.data.token)
+            to.overdue(resp);
             if (resp.data.errno === 408){
+                storage.set('token',resp.data.data.token)
                 ctx.commit('setResult',true);
             } else {
                 ctx.commit('setResult',false);
@@ -107,19 +110,20 @@ export default {
          * @param ctx
          * @param uid 教师id
          */
-        async del(ctx,uid){
+        async del(ctx,uid) {
             //设置加载状态
-            ctx.commit('setLoading',true)
+            ctx.commit('setLoading', true)
             const resp = await teacherAPI.del(uid);
-            console.log("响应结果",resp);
+            to.overdue(resp);
             //更新缓存的token
-            storage.set('token',resp.data.data.token)
-            if (resp.data.errno === 408){
-                ctx.commit('setResult',true);
+            if (resp.data.errno === 408) {
+                storage.set('token', resp.data.data.token)
+                ctx.commit('setResult', true);
             } else {
-                ctx.commit('setResult',false);
+                ctx.commit('setResult', false);
             }
-            ctx.commit('setLoading',false);
+            ctx.commit('setLoading', false);
+
         },
 
         /**
@@ -132,6 +136,7 @@ export default {
             //设置加载中
             ctx.commit("setLoading", true)
             const resp = await teacherAPI.getTeacherList(pager);
+            to.overdue(resp);
             if (resp.data.errno === 408) {
                 // console.log(resp.data.data.list)
                 //提交总页数
@@ -151,14 +156,14 @@ export default {
          * 查询教师
          * @param ctx
          * @param pager
-         * @param selectKey
          * @returns {Promise<void>}
          */
         async selectTeacher(ctx,pager){
            ctx.commit("setLoading",true)
            const resp = await teacherAPI.selectTeacher(pager);
+            to.overdue(resp);
+
            if (resp.data.errno === 408){
-               console.log("查询成功",resp.data.data.list)
                //提交总页数
                ctx.commit('setPageTotal',resp.data.data.list['total'])
                //将查询的结果存入list
@@ -180,8 +185,9 @@ export default {
         async insert(ctx,teacher){
             ctx.commit('setLoading',true)
             const resp = await teacherAPI.insert(teacher);
-            storage.set("token",resp.data.data.token)
+            to.overdue(resp);
             if (resp.data.errno === 408){
+                storage.set("token",resp.data.data.token)
                 console.log("新增成功")
             } else {
                 console.log("新增失败")
@@ -199,8 +205,9 @@ export default {
         async selectById(ctx,uid){
             ctx.commit('setLoading',true)
             const resp = await teacherAPI.selectById(uid);
-            storage.set("token",resp.data.data.token)
+            to.overdue(resp);
             if (resp.data.errno === 408){
+                storage.set("token",resp.data.data.token)
                 ctx.commit('setTeacher',resp.data.data.teacher)
             } else {
                 console.log("操作失败")

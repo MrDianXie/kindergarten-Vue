@@ -27,8 +27,8 @@ export default {
          */
         async getClassList(ctx){
             const resp = await api.getList();
-            storage.set("token",resp.data.data.token)
             if (resp.data.errno === 408) {
+                storage.set("token",resp.data.data.token)
                 ctx.commit("setList", resp.data.data.list)
             } else {
                 //请求失败

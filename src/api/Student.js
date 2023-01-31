@@ -36,3 +36,43 @@ export async function selectByKey(pager) {
         }
     })
 }
+
+/**
+ * 新增一条学生数据
+ * @param student
+ * @returns {Promise<*>}
+ */
+export async function insert(student) {
+    return axios({
+        method : 'POST',
+        headers: {
+            'X-Admin-Token': store.getters['User/getToken'],
+        },
+        url: 'http://localhost:8090/admin/student/insert',
+        data: {
+            sname: student.sname,
+            gander: student.gander,
+            age: student.age,
+            address: student.address,
+            cid: student.cid,
+        }
+    })
+}
+
+/**
+ * 删除一条学生信息
+ * @param sid
+ * @returns {Promise<*>}
+ */
+export async function del(sid){
+    return await axios({
+        method: 'DELETE',
+        url:'http://localhost:8090/admin/student/del',
+        headers:{
+            'X-Admin-Token': store.getters['User/getToken']
+        },
+        params:{
+            sid: sid
+        }
+    })
+}
