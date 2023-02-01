@@ -51,7 +51,7 @@ export async function getTeacherList(pager){
         headers: {
             'X-Admin-Token': store.getters['User/getToken']
         },
-        params:{
+        data:{
             current:pager.page,
             size:pager.size
         }

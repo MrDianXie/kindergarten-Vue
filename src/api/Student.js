@@ -10,7 +10,7 @@ export async function getList(pager) {
         headers:{
             'X-Admin-Token': store.getters['User/getToken']
         },
-        params:{
+        data:{
             current:pager.page,
             size:pager.size
         }
@@ -37,6 +37,25 @@ export async function selectByKey(pager) {
     })
 }
 
+
+/**
+ *  通过id查询学生
+ * @param sid 学生id
+ * @returns {Promise<void>}
+ */
+export async function selectById(sid){
+    return axios ({
+        method:'GET',
+        url:'http://localhost:8090/admin/student/selectById',
+        headers: {
+            'X-Admin-Token': store.getters['User/getToken'],
+        },
+        params:{
+            sid:sid
+        }
+    })
+}
+
 /**
  * 新增一条学生数据
  * @param student
@@ -55,6 +74,7 @@ export async function insert(student) {
             age: student.age,
             address: student.address,
             cid: student.cid,
+            uid: student.uid
         }
     })
 }
@@ -76,3 +96,46 @@ export async function del(sid){
         }
     })
 }
+/**
+ * 批量删除学生
+ * @param sids 学生ids
+ * @returns {Promise<void>}
+ */
+export async function delAll(sids){
+    return axios({
+        method: 'DELETE',
+        url:'http://localhost:8090/admin/student/delAll',
+        headers: {
+            'X-Admin-Token': store.getters['User/getToken']
+        },
+        params:{
+            sids: sids
+        }
+    })
+}
+/**
+ * 更新学生信息
+ * @param student 学生信息
+ * @returns {Promise<*>}
+ */
+export async function update(student){
+    console.log("up学生id",student.sid)
+    return axios({
+        method:'PUT',
+        url:'http://localhost:8090/admin/student/update',
+        headers: {
+            'X-Admin-Token': store.getters['User/getToken']
+        },
+        data:{
+            sid: student.sid,
+            sname: student.sname,
+            gander: student.gander,
+            address: student.address,
+            cid: student.cid,
+            uid: student.uid
+        }
+    })
+}
+
+
+

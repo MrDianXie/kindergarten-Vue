@@ -11,11 +11,11 @@ import Layout from '@/components/Layout'
 import VueParticles from 'vue-particles'
 import './plugins/charts.js'
 Vue.use(VueParticles)
-
-
-Vue.component("Layout",Layout)
 Vue.use(router)
+Vue.component("Layout",Layout)
 store.dispatch("User/whoAmI")
+
+
 Vue.config.productionTip = false
 
 new Vue({

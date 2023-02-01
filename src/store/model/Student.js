@@ -1,6 +1,7 @@
 import * as api from '@/api/Student'
-import storage from "@/utils/storage";
 import * as to from '@/utils/to'
+import storage from "@/utils/storage";
+import * as teacherAPI from "@/api/Teacher";
 
 export default {
     namespaced : true,
@@ -9,6 +10,7 @@ export default {
         list:[],//学生列表
         result: false, //返回结果
         pageTotal: null,//总页数
+        student: null, //学生
 
     },
 
@@ -24,6 +26,9 @@ export default {
         setPageTotal(state, payload) {
             state.pageTotal = payload
         },
+        setStudent(state,student){
+            state.student = student;
+        },
     },
     getters:{
         getList(state){
@@ -36,6 +41,10 @@ export default {
 
         getPageTotal(state) {
             return state.pageTotal;
+        },
+
+        getStudent(state){
+            return state.student;
         },
 
     },
@@ -55,7 +64,6 @@ export default {
                 ctx.commit('setResult',true)
                 ctx.commit('setPageTotal',resp.data.data.total)
                 ctx.commit('setList',resp.data.data.list)
-                console.log("student",resp.data.data.list)
             } else {
                 ctx.commit('setResult',false)
             }
@@ -79,6 +87,25 @@ export default {
                 ctx.commit('setResult', false)
             }
 
+        },
+
+
+        /**
+         * 通过id查询学生
+         * @param ctx
+         * @param sid 学生id
+         * @returns {Promise<void>}
+         */
+        async selectById(ctx,sid){
+            const resp = await api.selectById(sid);
+            to.overdue(resp);
+            if (resp.data.errno === 408){
+                console.log('单条',resp.data.data.student)
+                storage.set("token",resp.data.data.token)
+                ctx.commit('setStudent',resp.data.data.student)
+            } else {
+                console.log("操作失败")
+            }
         },
 
         /**
@@ -115,5 +142,41 @@ export default {
                 ctx.commit('setResult',false)
             }
         },
+
+        /**
+         * 批量删除
+         * @param ctx
+         * @param sids 用户ids
+         * @returns {Promise<void>}
+         */
+        async delAll(ctx,sids){
+            const resp = await api.delAll(sids);
+            to.overdue(resp);
+            if (resp.data.errno === 408){
+                storage.set('token',resp.data.data.token)
+                ctx.commit('setResult',true);
+            } else {
+                ctx.commit('setResult',false);
+            }
+        },
+
+        /**
+         * 更新学生信息
+         * @param ctx
+         * @param student 学生信息
+         * @returns {Promise<void>}
+         */
+        async update(ctx,student){
+            const resp = await api.update(student);
+            to.overdue(resp);
+            if (resp.data.errno === 408){
+                storage.set('token',resp.data.data.token)
+                ctx.commit('setResult',true);
+            } else {
+                ctx.commit('setResult',false);
+            }
+        },
+
+
     },
 }

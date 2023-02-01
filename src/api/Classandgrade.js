@@ -11,3 +11,17 @@ export async function getList() {
         }
     })
 }
+
+export async function list(pager) {
+    return axios({
+        method: 'GET',
+        url: 'http://localhost:8090/admin/class/list',
+        headers:{
+            'X-Admin-Token': store.getters['User/getToken']
+        },
+        data:{
+            current: pager.page,
+            size: pager.size
+        }
+    })
+}

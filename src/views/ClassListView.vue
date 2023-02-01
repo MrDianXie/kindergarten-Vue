@@ -5,8 +5,8 @@
       <div class="bread">
         <el-breadcrumb separator-class="el-icon-arrow-right">
           <el-breadcrumb-item :to="{ name:'home' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>学生管理</el-breadcrumb-item>
-          <el-breadcrumb-item>学生列表</el-breadcrumb-item>
+          <el-breadcrumb-item>班级管理</el-breadcrumb-item>
+          <el-breadcrumb-item>班级列表</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <div class="input-search">
@@ -48,40 +48,27 @@
       <el-table-column type="selection"></el-table-column>
       <el-table-column type="index" label="序号" sortable column-key="date"></el-table-column>
       <el-table-column
-          prop="sname"
-          label="姓名">
-      </el-table-column>
-      <el-table-column
-          prop="gander"
-          label="性别"
-      >
-      </el-table-column>
-      <el-table-column
-          prop="age"
-          label="年龄"
-      >
-      </el-table-column>
-      <el-table-column
-          prop="address"
-          width="260"
-          label="家庭地址"
-      >
-      </el-table-column>
-      <el-table-column
-          prop="className"
+          prop="cname"
           label="班级">
       </el-table-column>
       <el-table-column
-          prop="patriarchName"
-          label="家长">
+          prop="teacherName"
+          label="班主任"
+      >
+      </el-table-column>
+      <el-table-column
+          label="班级状态"
+      >
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.state === 1" type="success">启用中</el-tag>
+          <el-tag v-if="scope.row.state === 2" type="danger">禁用</el-tag>
+        </template>
       </el-table-column>
       <el-table-column
           prop="createTime"
-          width="180"
           label="创建时间">
       </el-table-column>
       <el-table-column
-          width="180"
           prop="updateTime"
           label="修改时间">
       </el-table-column>
@@ -90,7 +77,7 @@
         <template slot-scope="scope">
           <el-button
               size="mini"
-              @click="update(scope.row.uid)">编辑</el-button>
+              @click="update(scope.row.sid)">编辑</el-button>
           <el-popconfirm
               confirm-button-text='确定'
               cancel-button-text='取消'
@@ -184,6 +171,21 @@
                 </el-option>
               </el-select>
             </el-form-item>
+            <el-form-item
+                label="家长"
+                :label-width="formLabelWidth"
+                prop="uid"
+            >
+              <el-select v-model="form.uid" filterable placeholder="请选择">
+                <el-option
+                    v-for="item in this.parentList"
+                    :key="item.uid"
+                    :label="item.username"
+                    :value="item.uid">
+                </el-option>
+              </el-select>
+            </el-form-item>
+
           </el-form>
           <div class="demo-drawer__footer">
             <el-button class="btn" @click="cancelForm()">取 消</el-button>
@@ -212,8 +214,9 @@ export default {
       table: false, //模态框标识
       dialog: false, //是否开启模态框
       handleTitle: '', //模态框标题
-      loading: false, //家长状态
+      loading: false,
       form: { //表单数据
+        sid: null,
         sname: null,
         gander: null,
         age: null,
@@ -241,10 +244,10 @@ export default {
       },
 
 
-      classAndGrade:[],//班级列表
+
       formLabelWidth: '80px',
       timer: null,
-      list: [], //学生列表
+      list: [], //班级列表
 
       pager:{ //分页数据
         page: 1,
@@ -275,18 +278,20 @@ export default {
     /**
      * 修改教师信息
      */
-    async update(uid){
+    async update(sid){
       this.dialog = true;
       this.handleTitle = 'update'
-      //通过id将要修改的教师
-      await this.$store.dispatch('teacher/selectById',uid);
+      //通过id将要修改的学生
+      await this.$store.dispatch('student/selectById',sid);
       //将教师信息传到form里
-      var teacher = this.$store.getters['teacher/getTeacher'];
-      this.form.username = teacher.username;
-      this.form.gander = teacher.gander;
-      this.form.phone = parseInt(teacher.phone);
-      this.form.email = teacher.email;
-      this.form.uid = teacher.uid;
+      var student = this.$store.getters["student/getStudent"];
+      this.form.sid = student.sid;
+      this.form.sname = student.sname;
+      this.form.gander = student.gander;
+      this.form.age = parseInt(student.age);
+      this.form.address = student.address;
+      this.form.cid = student.cid;
+      this.form.uid = student.uid;
       console.log('form',this.form)
     },
 
@@ -295,14 +300,14 @@ export default {
      */
     async delAll(){
       // console.log("users",this.multipleSelection)
-      var uids = '';
-      this.multipleSelection.forEach(user => {
-        console.log(user.uid)
-        uids = uids + user.uid + '-';
+      var sids = '';
+      this.multipleSelection.forEach(student => {
+        console.log(student.sid)
+        sids = sids + student.sid + '-';
       })
 
-      await this.$store.dispatch('teacher/delAll',uids);
-      const result = this.$store.getters['teacher/getDelResult'];
+      await this.$store.dispatch('student/delAll',sids);
+      const result = this.$store.getters['student/getResult'];
       if (result){
         this.$message({
           showClose: true,
@@ -317,7 +322,6 @@ export default {
         });
       }
       this.loadList()
-
     },
 
     /**
@@ -363,13 +367,6 @@ export default {
     },
 
     /**
-     * 清空表单
-     * */
-    resetForm(){},
-
-
-
-    /**
      * 打开新增/修改
      */
     async handleClose() {
@@ -385,7 +382,6 @@ export default {
                   //新增
                   this.$store.dispatch('student/insert', this.form)
                 } else if (this.handleTitle === 'update'){
-
                   //修改
                   this.$store.dispatch('student/update',this.form)
                 }
@@ -416,6 +412,13 @@ export default {
                   }
                   this.$refs['form'].resetFields();
                 } else {
+                  if (this.$store.getters["student/getResult"]){
+                    this.$message({
+                      showClose: true,
+                      message: '修改成功',
+                      type: 'success'
+                    });
+                  }
                   this.dialog = false;
                 }
               }, 400);
@@ -440,11 +443,11 @@ export default {
      * @returns {Promise<void>}
      */
     async loadList(){
-      await this.$store.dispatch('student/getStudentList',this.pager);
-      this.list = this.$store.getters['student/getList'];
-      this.pager.total = this.$store.getters['student/getPageTotal'];
-      await this.$store.dispatch('classAndGrade/getClassList');
-      this.classAndGrade = this.$store.getters["classAndGrade/getList"];
+      //初始化班级列表
+      await this.$store.dispatch('classAndGrade/getList',this.pager);
+      this.list = this.$store.getters["classAndGrade/getList"];
+      //初始化分页数据
+      this.pager.total = this.$store.getters['classAndGrade/getPageTotal'];
     }
 
   },

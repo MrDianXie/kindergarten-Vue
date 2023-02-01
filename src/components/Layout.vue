@@ -21,6 +21,7 @@
           </el-dropdown>
         </el-col>
       </span>
+
     </el-header>
     <el-container class="container">
       <el-aside width="200px">
@@ -78,7 +79,7 @@
                 <span>班级管理</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item>选项1</el-menu-item>
+                <el-menu-item index="/admin/classList">班级列表</el-menu-item>
                 <el-menu-item>选项2</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
@@ -130,6 +131,7 @@ export default {
       drawer: false,
       user: {},
       avatarUrl: '',
+      color: ''
     }
 
 
@@ -144,9 +146,11 @@ export default {
       if (comm === 'personal'){
         this.title = '个人信息';
         this.drawer = true;
-      } else if(comm === 'updatePass'){
+      } else if(comm === 'updatePass') {
         this.title = '修改密码';
         this.drawer = true;
+      } else if(comm === 'settings'){
+
       } else {
         this.$confirm('是否退出登录？', '提示', {
           confirmButtonText: '确定',

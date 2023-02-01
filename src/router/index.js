@@ -30,7 +30,7 @@ const routes = [
   {
     path: '/admin/teacherList',
     name: 'teacherList',
-    component: () => import("@/views/TeacherList"),
+    component: () => import("@/views/TeacherListView"),
     meta:{
       auth: true
     }
@@ -39,12 +39,20 @@ const routes = [
   {
     path: '/admin/studentList',
     name: 'studentList',
-    component: () => import("@/views/StudentList"),
+    component: () => import("@/views/StudentListView"),
     meta:{
       auth: true
     }
 
-  }
+  },
+  {
+    path: '/admin/classList',
+    name: 'classList',
+    component: () => import("@/views/ClassListView"),
+    meta:{
+      auth: true
+    }
+  },
 ]
 
 
