@@ -1,4 +1,18 @@
 /**
+ * 获取教师列表
+ * @returns {Promise<void>}
+ */
+export async function list() {
+    return await axios({
+        method:'GET',
+        url:'http://localhost:8090/admin/teacher/list',
+        headers: {
+            'X-Admin-Token': store.getters['User/getToken']
+        },
+    })
+}
+
+/**
  * 更新教师信息
  * @param teacher 教师信息
  * @returns {Promise<*>}

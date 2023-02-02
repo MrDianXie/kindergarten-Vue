@@ -69,10 +69,10 @@
               </template>
               <el-menu-item-group>
                 <el-menu-item index="/admin/studentList">学生列表</el-menu-item>
+                <el-menu-item index="/admin/comment">学生评语</el-menu-item>
                 <el-menu-item>学生审批</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
-
             <el-submenu index="4">
               <template slot="title">
                 <i class="el-icon-s-data"></i>
@@ -83,18 +83,6 @@
                 <el-menu-item>选项2</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
-
-            <el-submenu index="5">
-              <template slot="title">
-                <i class="el-icon-s-custom"></i>
-                <span>角色管理</span>
-              </template>
-              <el-menu-item-group>
-                <el-menu-item>选项1</el-menu-item>
-                <el-menu-item>选项2</el-menu-item>
-              </el-menu-item-group>
-            </el-submenu>
-
           </el-menu>
         </el-col>
       </el-aside>

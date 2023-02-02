@@ -44,15 +44,15 @@
         </el-col>
         <el-col :span="16">
           <!-- 柱状图 -->
-          <el-card style="height: 280px">
+          <el-card style="height: 280px;">
             <div style="height:280px;" ref="barEcharts">{{ initBarEcharts() }}</div>
           </el-card>
           <div class="num graph">
-            <el-card style="width: 34%;height: 265px;marginRight: 1%">
+            <el-card style="width: 34%;height: 265px;marginRight:1%;">
               <div style="width: 100%;height: 265px;" ref="pieEcharts">{{ initPieEcharts() }}</div>
             </el-card>
-            <el-card style="width:65%;height: 265px">
-              <div >
+            <el-card style="width:65%;height: 265px;">
+              <div>
                 <el-calendar v-model="value"></el-calendar>
               </div>
             </el-card>
@@ -60,7 +60,7 @@
         </el-col>
         <el-col :span="24">
           <el-card shadow='hover' class="bottom">
-            <el-descriptions class="margin-top" title="版本信息" :column="3" :size="size">
+            <el-descriptions class="margin-top" title="版本信息" :column="3">
               <el-descriptions-item label="当前版本">2.0bt</el-descriptions-item>
               <el-descriptions-item label="开发团队成员">谢金宏、李雄璘、肖剑锋、黄耀锋、黄恒祥</el-descriptions-item>
               <el-descriptions-item label="居住地">广西壮族自治区南宁市</el-descriptions-item>

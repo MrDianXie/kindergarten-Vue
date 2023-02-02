@@ -1,6 +1,6 @@
 <template>
   <layout>
-    公告
+
   </layout>
 </template>
 

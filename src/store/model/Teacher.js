@@ -67,6 +67,24 @@ export default {
 
     actions: {
 
+
+        /**
+         * 获取教师列表
+         * @param ctx
+         * @returns {Promise<void>}
+         */
+        async list(ctx){
+            const resp = await teacherAPI.list();
+            to.overdue(resp);
+            if (resp.data.errno === 408){
+                ctx.commit('setList',resp.data.data.list);
+                storage.setToken(resp.data.data.token);
+                ctx.commit('setResult',true);
+            } else {
+                ctx.commit('setResult',false);
+            }
+        },
+
         /**
          * 更新教师信息
          * @param ctx

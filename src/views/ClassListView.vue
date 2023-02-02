@@ -42,11 +42,12 @@
         v-loading="loading"
         element-loading-text="拼命加载中"
         element-loading-spinner="el-icon-loading"
+        :default-sort = "{prop: 'state', order: 'descending'}"
         element-loading-background="rgba(192, 192, 192, 0.8)"
         :data="list"
         style="width: 100%">
       <el-table-column type="selection"></el-table-column>
-      <el-table-column type="index" label="序号" sortable column-key="date"></el-table-column>
+      <el-table-column type="index" label="序号" column-key="date"></el-table-column>
       <el-table-column
           prop="cname"
           label="班级">
@@ -57,35 +58,40 @@
       >
       </el-table-column>
       <el-table-column
+          prop="state"
+          sortable
           label="班级状态"
       >
         <template slot-scope="scope">
           <el-tag v-if="scope.row.state === 1" type="success">启用中</el-tag>
-          <el-tag v-if="scope.row.state === 2" type="danger">禁用</el-tag>
+          <el-tag v-if="scope.row.state === 0" type="danger">禁用</el-tag>
         </template>
       </el-table-column>
       <el-table-column
           prop="createTime"
+          sortable
           label="创建时间">
       </el-table-column>
       <el-table-column
           prop="updateTime"
+          sortable
           label="修改时间">
+
       </el-table-column>
 
       <el-table-column label="操作" width="180">
         <template slot-scope="scope">
           <el-button
               size="mini"
-              @click="update(scope.row.sid)">编辑</el-button>
+              @click="update(scope.row.cid)">编辑</el-button>
           <el-popconfirm
               confirm-button-text='确定'
               cancel-button-text='取消'
               icon="el-icon-info"
               icon-color="red"
-              :title="'确定删除'+ scope.row.sname +'的信息吗？'"
+              :title="'确定删除'+ scope.row.cname +'的信息吗？'"
               class="del-btn"
-              @confirm="del(scope.row.sid)"
+              @confirm="del(scope.row.cid)"
           >
             <el-button
                 size="mini"
@@ -115,7 +121,7 @@
     <!--  新增  -->
     <el-drawer
         class="drawer"
-        :title="this.handleTitle === 'insert' ? '新增学生':'修改学生信息'"
+        :title="this.handleTitle === 'insert' ? '新增班级':'修改班级信息'"
         :size="'50%'"
         :visible.sync="dialog"
         direction="ltr"
@@ -126,66 +132,41 @@
         <div class="form">
           <el-form :model="form" :rules="rules" ref="form">
             <el-form-item
-                label="学生姓名"
+                label="班级名称"
                 :label-width="formLabelWidth"
-                prop="sname"
+                prop="cname"
             >
-              <el-input v-model="form.sname" autocomplete="off"></el-input>
+              <el-input v-model="form.cname" autocomplete="off"></el-input>
             </el-form-item>
             <el-form-item
-                label="年龄"
-                :label-width="formLabelWidth"
-                prop="age"
-            >
-            <el-input maxlength="2" show-word-limit v-model.number="form.age" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item
-                label="家庭地址"
-                :label-width="formLabelWidth"
-                prop="address"
-            >
-              <el-input v-model="form.address" autocomplete="off"></el-input>
-            </el-form-item>
-            <el-form-item
-                label="性别"
-                :label-width="formLabelWidth"
-                prop="gander"
-            >
-              <el-select v-model="form.gander" placeholder="请选择性别">
-                <el-option label="男" value="男"></el-option>
-                <el-option label="女" value="女"></el-option>
-              </el-select>
-            </el-form-item>
-
-            <el-form-item
-                label="班级"
-                :label-width="formLabelWidth"
-                prop="cid"
-            >
-              <el-select v-model="form.cid" filterable placeholder="请选择">
-                <el-option
-                    v-for="item in this.classAndGrade"
-                    :key="item.cid"
-                    :label="item.cname"
-                    :value="item.cid">
-                </el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item
-                label="家长"
+                label="班主任"
                 :label-width="formLabelWidth"
                 prop="uid"
             >
               <el-select v-model="form.uid" filterable placeholder="请选择">
                 <el-option
-                    v-for="item in this.parentList"
+                    v-for="item in this.teacherList"
                     :key="item.uid"
                     :label="item.username"
                     :value="item.uid">
                 </el-option>
               </el-select>
             </el-form-item>
-
+            <el-form-item
+                label="班级状态"
+                :label-width="formLabelWidth"
+                prop="state"
+            >
+              <el-tooltip :content="form.state === 1 ? '启用':'禁用'" placement="top">
+                <el-switch
+                    v-model="form.state"
+                    active-color="#ff4949"
+                    inactive-color="#13ce66"
+                    :active-value="0"
+                    :inactive-value="1">
+                </el-switch>
+              </el-tooltip>
+            </el-form-item>
           </el-form>
           <div class="demo-drawer__footer">
             <el-button class="btn" @click="cancelForm()">取 消</el-button>
@@ -209,45 +190,30 @@ export default {
   },
   data() {
     return {
-
-
       table: false, //模态框标识
       dialog: false, //是否开启模态框
       handleTitle: '', //模态框标题
       loading: false,
       form: { //表单数据
-        sid: null,
-        sname: null,
-        gander: null,
-        age: null,
-        address: null,
         cid: null,
+        cname: null,
         uid: null,
+        state: null,
       },
 
       rules: {
-        sname: [
-          { required: true, message: '请输入学生名字', trigger: 'blur' },
+        cname: [
+          { required: true, message: '请输入班级名字', trigger: 'blur' },
         ],
-        address: [
-          { required: true, message: '请输入学生家庭地址', trigger: 'blur' }
-        ],
-        age: [
-          { type: 'number', required: true, message: '请输入学生年龄', trigger: 'blur' }
-        ],
-        gander: [
-          { required: true, message: '请选择学生性别', trigger: 'change' }
-        ],
-        cid: [
-          { type: 'number', required: true, message: '请选择学生班级', trigger: 'change' }
+        uid: [
+          { required: true, message: '请选择班主任', trigger: ['change','blur'] }
         ],
       },
-
-
 
       formLabelWidth: '80px',
       timer: null,
       list: [], //班级列表
+      teacherList: [],
 
       pager:{ //分页数据
         page: 1,
@@ -277,37 +243,32 @@ export default {
 
     /**
      * 修改教师信息
+     * @param cid 班级id
      */
-    async update(sid){
+    async update(cid){
       this.dialog = true;
       this.handleTitle = 'update'
       //通过id将要修改的学生
-      await this.$store.dispatch('student/selectById',sid);
+      await this.$store.dispatch('classAndGrade/selectById',cid);
       //将教师信息传到form里
-      var student = this.$store.getters["student/getStudent"];
-      this.form.sid = student.sid;
-      this.form.sname = student.sname;
-      this.form.gander = student.gander;
-      this.form.age = parseInt(student.age);
-      this.form.address = student.address;
-      this.form.cid = student.cid;
-      this.form.uid = student.uid;
-      console.log('form',this.form)
+      var classAndGarde = this.$store.getters["classAndGrade/getClass"];
+      this.form.cid = classAndGarde.cid;
+      this.form.state = classAndGarde.state;
+      this.form.uid = classAndGarde.uid;
+      this.form.cname = classAndGarde.cname;
     },
 
     /**
      * 批量删除
      */
     async delAll(){
-      // console.log("users",this.multipleSelection)
-      var sids = '';
-      this.multipleSelection.forEach(student => {
-        console.log(student.sid)
-        sids = sids + student.sid + '-';
+      var cids = '';
+      this.multipleSelection.forEach(classAndGarde => {
+        cids = cids + classAndGarde.cid + '-';
       })
 
-      await this.$store.dispatch('student/delAll',sids);
-      const result = this.$store.getters['student/getResult'];
+      await this.$store.dispatch('classAndGrade/delAll',cids);
+      const result = this.$store.getters['classAndGrade/getResult'];
       if (result){
         this.$message({
           showClose: true,
@@ -321,17 +282,17 @@ export default {
           type: 'error'
         });
       }
-      this.loadList()
+      await this.loadList()
     },
 
     /**
      * 删除单条学生数据
-     * @param sid 学生id
+     * @param cid 班级id
      * */
-    async del(sid){
-      await this.$store.dispatch('student/del',sid);
+    async del(cid){
+      await this.$store.dispatch('classAndGrade/del',cid);
       //更新一下列表
-      const result = await this.$store.getters['student/getResult'];
+      const result = await this.$store.getters['classAndGrade/getResult'];
       if (result){
         this.$message({
           showClose: true,
@@ -345,18 +306,17 @@ export default {
           type: 'error'
         });
       }
-      this.loadList()
+      await this.loadList()
     },
     /**
      * 条件查询（模糊）
      */
     async search() {
       this.loading = true;
-      console.log("selectKey",this.pager.selectKey)
-      await this.$store.dispatch('student/selectByKey',this.pager);
+      await this.$store.dispatch('classAndGrade/selectByKey',this.pager);
       setTimeout(()=>{
         this.loading = false
-        this.list = this.$store.getters['student/getList']
+        this.list = this.$store.getters['classAndGrade/getList']
       },1000)
 
     },
@@ -380,30 +340,30 @@ export default {
               if (valid) {
                 if (this.handleTitle === 'insert'){
                   //新增
-                  this.$store.dispatch('student/insert', this.form)
+                  this.$store.dispatch('classAndGrade/insert', this.form)
                 } else if (this.handleTitle === 'update'){
                   //修改
-                  this.$store.dispatch('student/update',this.form)
+                  this.$store.dispatch('classAndGrade/update',this.form)
                 }
                 this.loading = true;
               } else {
                 this.$message({
                   showClose: true,
-                  message: '请输入完整的学生信息',
+                  message: '请输入完整的班级信息',
                   type: 'error'
                 });
-                return false;
+                this.$store.commit("classAndGrade/setResult",false)
               }
             });
             this.timer = setTimeout(() => {
               // 动画关闭需要一定的时间
               setTimeout(() => {
                 this.loading = false;
-                // console.log('更新list',this.$store.getters['teacher/getList'])
                 this.loadList()
                 //清空form
                 if (this.handleTitle === 'insert'){
-                  if (this.$store.getters["student/getResult"]){
+                  console.log(this.$store.getters["classAndGrade/getResult"])
+                  if (this.$store.getters["classAndGrade/getResult"]){
                     this.$message({
                       showClose: true,
                       message: '新增成功',
@@ -412,7 +372,7 @@ export default {
                   }
                   this.$refs['form'].resetFields();
                 } else {
-                  if (this.$store.getters["student/getResult"]){
+                  if (this.$store.getters["classAndGrade/getResult"]){
                     this.$message({
                       showClose: true,
                       message: '修改成功',
@@ -448,6 +408,9 @@ export default {
       this.list = this.$store.getters["classAndGrade/getList"];
       //初始化分页数据
       this.pager.total = this.$store.getters['classAndGrade/getPageTotal'];
+      //初始化班主任列表
+      await this.$store.dispatch('teacher/list');
+      this.teacherList = this.$store.getters["teacher/getList"];
     }
 
   },

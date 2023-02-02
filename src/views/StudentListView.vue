@@ -291,7 +291,8 @@ export default {
 
 
     /**
-     * 修改教师信息
+     * 修改信息
+     * @param sid 学生id
      */
     async update(sid){
       this.dialog = true;
@@ -307,7 +308,6 @@ export default {
       this.form.address = student.address;
       this.form.cid = student.cid;
       this.form.uid = student.uid;
-      console.log('form',this.form)
     },
 
     /**
