@@ -185,7 +185,6 @@ export default {
     this.loadList()
   },
   data() {
-
     return {
       table: false,
       dialog: false,

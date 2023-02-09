@@ -10,7 +10,7 @@ export async function getList(pager) {
         headers:{
             'X-Admin-Token': store.getters['User/getToken']
         },
-        data:{
+        params:{
             current:pager.page,
             size:pager.size
         }

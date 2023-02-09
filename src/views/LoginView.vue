@@ -1,9 +1,9 @@
 <template>
   <div>
-    <lantern text="新" :left="10"/>
-    <lantern text="春" :left="30"/>
-    <lantern text="快" :left="60"/>
-    <lantern text="乐" :left="80"/>
+    <lantern  :left="10"/>
+    <lantern  :left="30"/>
+    <lantern  :left="60"/>
+    <lantern  :left="80"/>
 
     <div class="login-box">
       <vue-particles

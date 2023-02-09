@@ -118,7 +118,6 @@
           :total="pager.total"
           @current-change="loadList"
           :current-page.sync="pager.page"
-
       >
 
       </el-pagination>

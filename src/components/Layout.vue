@@ -2,7 +2,7 @@
   <el-container>
     <el-header>
       <span>
-        <img src="../assets/logo.png" width="50" alt="">
+        <img src="../assets/ETO.png" width="50" alt="">
         <b>翻斗花园后端管理系统</b>
       </span>
 
@@ -44,10 +44,9 @@
                 <i class="el-icon-tickets"></i>
                 <span>公告管理</span>
               </template>
-
               <el-menu-item-group>
-                <el-menu-item>公告列表</el-menu-item>
-                <el-menu-item index="/admin/afficheList">新增公告</el-menu-item>
+                <el-menu-item index="/admin/afficheList">公告列表</el-menu-item>
+                <el-menu-item index="/admin/afficheAudit">公告审核</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
 
@@ -69,7 +68,6 @@
               </template>
               <el-menu-item-group>
                 <el-menu-item index="/admin/studentList">学生列表</el-menu-item>
-                <el-menu-item index="/admin/comment">学生评语</el-menu-item>
                 <el-menu-item>学生审批</el-menu-item>
               </el-menu-item-group>
             </el-submenu>
@@ -106,6 +104,24 @@
         </el-form>
       </div>
     </el-drawer>
+    <!--  修改密码页  -->
+    <el-dialog title="修改密码" :visible.sync="dialogFormVisible">
+      <el-form :model="user">
+        <el-form-item label="原密码" >
+          <el-input v-model="oldPass" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="新密码" >
+          <el-input v-model="newPass" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" >
+          <el-input v-model="rePass" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="updatePass">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-container>
 </template>
 
@@ -117,9 +133,13 @@ export default {
     return {
       title: '',
       drawer: false,
+      dialogFormVisible: false,
       user: {},
       avatarUrl: '',
-      color: ''
+      color: '',
+      oldPass : '',
+      newPass: '',
+      rePass : ''
     }
 
 
@@ -131,12 +151,11 @@ export default {
       console.log("修改头像")
     },
     openPersonal(comm){
-      if (comm === 'personal'){
+      if (comm === 'personal') {
         this.title = '个人信息';
         this.drawer = true;
-      } else if(comm === 'updatePass') {
-        this.title = '修改密码';
-        this.drawer = true;
+      } else if(comm === 'updatePass'){
+        this.dialogFormVisible = true;
       } else if(comm === 'settings'){
 
       } else {
@@ -157,7 +176,37 @@ export default {
 
       }
 
-    }
+    },
+
+    /**
+     * 修改密码
+     */
+    updatePass(){
+      console.log('执行',this.oldPass)
+      //输入原密码是否正确
+      if (this.oldPass === this.user.password){
+        //原密码正确
+        //判断两次输入密码是否一致
+        if(this.newPass === this.rePass){
+          //一致
+        } else {
+          //不一致
+          this.$message({
+            showClose: true,
+            message: '两次密码不一致',
+            type: 'error'
+          });
+          this.rePass = '';
+        }
+      } else {
+        //原密码错误
+        this.$message({
+          showClose: true,
+          message: '原密码错误',
+          type: 'error'
+        });
+      }
+    },
   },
 
   created() {

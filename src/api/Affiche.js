@@ -1,16 +1,3 @@
-/**
- * 获取班级list
- * @returns {Promise<*>}
- */
-export async function getList() {
-    return axios({
-        method: 'GET',
-        url: 'http://localhost:8090/admin/class/classList',
-        headers:{
-            'X-Admin-Token': store.getters['User/getToken']
-        }
-    })
-}
 
 /**
  * 分页查询
@@ -20,7 +7,7 @@ export async function getList() {
 export async function list(pager) {
     return axios({
         method: 'GET',
-        url: 'http://localhost:8090/admin/class/list',
+        url: 'http://localhost:8090/admin/affiche/list',
         headers:{
             'X-Admin-Token': store.getters['User/getToken']
         },
@@ -43,7 +30,7 @@ export async function selectByKey(pager) {
         headers: {
             'X-Admin-Token': store.getters['User/getToken'],
         },
-        url: 'http://localhost:8090/admin/class/selectByKey',
+        url: 'http://localhost:8090/admin/affiche/selectByKey',
         params: {
             selectKey: pager.selectKey,
             page: pager.page,
@@ -55,93 +42,110 @@ export async function selectByKey(pager) {
 
 /**
  * id查询
- * @param cid 班级id
+ * @param aid 公告id
  * @returns {Promise<void>}
  */
-export async function selectById(cid){
+export async function selectById(aid){
     return await axios ({
         method:'GET',
-        url:'http://localhost:8090/admin/class/selectById',
+        url:'http://localhost:8090/admin/affiche/selectById',
         headers: {
             'X-Admin-Token': store.getters['User/getToken'],
         },
         params:{
-            cid:cid
+            aid:aid
         }
     })
 }
 
 /**
  * 新增
- * @param classAndGrade
+ * @param affiche
  * @returns {Promise<*>}
  */
-export async function insert(classAndGrade) {
+export async function insert(affiche) {
+    console.log('affiche',affiche)
     return axios({
         method : 'POST',
         headers: {
             'X-Admin-Token': store.getters['User/getToken'],
         },
-        url: 'http://localhost:8090/admin/class/insert',
+        url: 'http://localhost:8090/admin/affiche/insert',
         data: {
-            cname:classAndGrade.cname,
-            uid: classAndGrade.uid,
-            state: classAndGrade.state,
+            title: affiche.title,
+            body: affiche.body,
+            uid: affiche.uid,
+            state: affiche.state,
         }
     })
 }
 
 /**
  * 删除
- * @param cid
+ * @param aid 公告id
  * @returns {Promise<*>}
  */
-export async function del(cid){
+export async function del(aid){
     return await axios({
         method: 'DELETE',
-        url:'http://localhost:8090/admin/class/del',
+        url:'http://localhost:8090/admin/affiche/del',
         headers:{
             'X-Admin-Token': store.getters['User/getToken']
         },
         params:{
-            cid: cid
+            aid: aid
         }
     })
 }
 /**
  * 批量删除
- * @param cids 班级ids
+ * @param aids 选择删除的公告id
  * @returns {Promise<void>}
  */
-export async function delAll(cids){
+export async function delAll(aids){
     return axios({
         method: 'DELETE',
-        url:'http://localhost:8090/admin/class/delAll',
+        url:'http://localhost:8090/admin/affiche/delAll',
         headers: {
             'X-Admin-Token': store.getters['User/getToken']
         },
         params:{
-            cids: cids
+            aids: aids
         }
     })
 }
 /**
  * 修改
- * @param classAndGrade 班级信息
+ * @param affiche 公告信息
  * @returns {Promise<*>}
  */
-export async function update(classAndGrade){
+export async function update(affiche){
     return axios({
         method:'PUT',
-        url:'http://localhost:8090/admin/class/update',
+        url:'http://localhost:8090/admin/affiche/update',
         headers: {
             'X-Admin-Token': store.getters['User/getToken']
         },
         data:{
-            cid: classAndGrade.cid,
-            cname: classAndGrade.cname,
-            uid: classAndGrade.uid,
-            state: classAndGrade.state
+            aid: affiche.aid,
+            title: affiche.title,
+            body: affiche.body,
+            uid: affiche.uid,
+            state: affiche.state
         }
     })
+}
+
+/**
+ * 查询未审核的公告
+ * @returns {Promise<void>}
+ */
+export async function selectAudit() {
+    return axios({
+        url:'http://localhost:8090/admin/affiche/selectAudit',
+        headers: {
+            'X-Admin-Token': store.getters['User/getToken']
+        }
+    })
+
 }

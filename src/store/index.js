@@ -5,6 +5,7 @@ import User from './model/User'
 import teacher from "@/store/model/Teacher";
 import student from '@/store/model/Student'
 import classAndGrade from '@/store/model/Classandgrade'
+import affiche from '@/store/model/Affiche'
 import parent from '@/store/model/Parent'
 import set from 'vuex-persistedstate'
 
@@ -19,17 +20,19 @@ const store = new Vuex.Store({
     student,
     classAndGrade,
     parent,
+    affiche,
   },
 
   plugins:[
       set({
         key: 'pc-store',
         paths: [
-            'User.user',
+          'User.user',
           'teacher',
           'student',
           'classAndGrade',
           'parent',
+          'affiche'
         ]
       })
   ]

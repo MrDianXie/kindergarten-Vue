@@ -53,6 +53,14 @@ const routes = [
       auth: true
     }
   },
+  {
+    path: '/admin/afficheAudit',
+    name: 'afficheAudit',
+    component: () => import("@/views/AfficheAuditView"),
+    meta:{
+      auth: true
+    }
+  },
 ]
 
 
